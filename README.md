@@ -7,7 +7,7 @@ React 是互動介面；`data/` 是可維護的設定來源。Zustand 只保存�
 - React + TypeScript + Vite
 - Zustand persisted store，含版本號與 rehydrate 時的孤兒 override 清理
 - Tailwind CSS v4；手寫 component class 一律放在 `@layer components`
-- Hash Router，可直接以本機檔案或靜態站台開啟
+- Hash Router 加相對 `base`，同一份 build 可從網域根目錄、`/guitar-tone-rig/` 這種子路徑或 `file://` 開啟
 - dev／preview port 由專案路徑推導後探測，見下方「Ports」
 - 字型自 host（`@fontsource`），離線不掉字
 
@@ -114,7 +114,7 @@ node scripts/show-preset.mjs mayer-asato-clean
 
 ## Checks
 
-`npm run check` 依序執行下列項目，CI（`.github/workflows/check.yml`）跑同一組：
+`npm run check` 依序執行下列項目；CI（`.github/workflows/check.yml`）與部署（`.github/workflows/deploy.yml`）跑同一組，紅的 main 不會上線：
 
 | 指令                         | 檢查內容                                                                                             |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------- |
@@ -135,6 +135,14 @@ node scripts/show-preset.mjs mayer-asato-clean
 - `font-size` 不在 `--text-*` 尺度內。
 - 某條路由在手機上沒有導覽入口（sidebar 與 footer 都是 `lg` 以上才顯示）。
 - 用 `0{n}` 寫死補零，而不是 `pad2()`。
+
+## Deploy
+
+推上 `main` 就由 `.github/workflows/deploy.yml` 跑 `npm run check`、`npm run build`，再把 `dist/` 發到 GitHub Pages：
+
+<https://yuhuan183.github.io/guitar-tone-rig/>
+
+Pages 的 source 設為 GitHub Actions，不使用 `gh-pages` 分支——`dist/` 在 `.gitignore` 裡，本來就不進版控。子路徑能運作是因為 `vite.config.ts` 的 `base: './'`：資產路徑相對於頁面，而 Hash Router 載入後不會再改動 URL 路徑。
 
 ## 版本
 

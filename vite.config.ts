@@ -27,6 +27,11 @@ function copyKnowledgeFiles(): Plugin {
  * `PREVIEW_PORT=… npm run preview`. See scripts/pick-port.mjs.
  */
 export default defineConfig(async () => ({
+  // Relative, not absolute: with a HashRouter the URL path never changes after
+  // load, so one build serves correctly from the domain root, from a project
+  // path like /guitar-tone-rig/ on GitHub Pages, and from file:// — which is
+  // what README promises and what an absolute /assets/… would break.
+  base: './',
   plugins: [react(), tailwindcss(), copyKnowledgeFiles()],
   server: {
     port: await pickPort({ seed: projectRoot, offset: 0, envVar: 'PORT' }),
