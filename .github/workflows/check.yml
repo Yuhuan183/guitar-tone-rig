@@ -1,9 +1,8 @@
 name: check
 
-on:
-  push:
-    branches: [main]
-  pull_request:
+# Pull requests only. deploy.yml runs the same gate on every push to main
+# before it publishes, so a second run here would just be the same work twice.
+on: pull_request
 
 # `npm ci` runs dependency lifecycle scripts, and this workflow runs on pull
 # requests from anywhere. Declare the token read-only here rather than inherit

@@ -85,7 +85,7 @@ React 19 + TypeScript + Vite，Tailwind CSS v4，Zustand（只存瀏覽器內的
 
 所有隨視窗寬度變化的值集中在 `src/lib/responsive.ts`，一個 scale 只宣告「在哪個視窗寬度該是多少」，`clamp()` 由 `npm run generate:responsive` 算出來，不是手調 `vw` 係數。
 
-`npm run check` 依序跑下面這些；CI（`.github/workflows/check.yml`）與部署（`.github/workflows/deploy.yml`）跑同一組，紅的 `main` 不會上線：
+`npm run check` 依序跑下面這些。PR 由 `.github/workflows/check.yml` 跑同一組，推上 `main` 則由 `.github/workflows/deploy.yml` 在發布前跑，所以紅的 `main` 不會上線：
 
 | 指令                         | 檢查內容                                                                                             |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------- |
