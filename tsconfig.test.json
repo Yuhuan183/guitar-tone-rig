@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
+    // The one place node globals belong: a test that pins the timezone has to
+    // reach process.env.TZ, and nothing in src/ should be able to.
+    "types": ["vite/client", "node"]
+  },
+  "include": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/__tests__/**/*", "src/test-setup.ts"],
+  "exclude": []
+}
