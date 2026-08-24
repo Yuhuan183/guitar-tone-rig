@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatSetting, nudge, positionValue, settingValue, valuePosition } from '../value'
+import { acceptsValue, formatSetting, nudge, positionValue, settingValue, valuePosition } from '../value'
 import type { Control, Setting } from '../../types'
 
 const clockKnob: Control = {
@@ -195,5 +195,35 @@ describe('nudge', () => {
   it('starts somewhere sane when there is no value yet', () => {
     expect(nudge(clockKnob, undefined, 1)).toBe('12:30')
     expect(nudge(enumSwitch, undefined, 1)).toBe('bright-tight')
+  })
+})
+
+describe('acceptsValue', () => {
+  it('takes what each control could really hold', () => {
+    expect(acceptsValue(clockKnob, '12:30')).toBe(true)
+    expect(acceptsValue(numberKnob, 10)).toBe(true)
+    expect(acceptsValue(offsetKnob, -12)).toBe(true)
+    expect(acceptsValue(enumSwitch, 'bright-tight')).toBe(true)
+    expect(acceptsValue(booleanSwitch, false)).toBe(true)
+  })
+
+  it('rejects the wrong type, an out-of-range number and an unlisted option', () => {
+    expect(acceptsValue(clockKnob, '25:00')).toBe(false)
+    expect(acceptsValue(clockKnob, 12)).toBe(false)
+    expect(acceptsValue(numberKnob, 999)).toBe(false)
+    expect(acceptsValue(numberKnob, Number.NaN)).toBe(false)
+    expect(acceptsValue(numberKnob, '10')).toBe(false)
+    expect(acceptsValue(enumSwitch, 'nonsense')).toBe(false)
+    expect(acceptsValue(booleanSwitch, 'true')).toBe(false)
+  })
+
+  it('rejects anything that is not a scalar at all, which is what tampering looks like', () => {
+    for (const control of [clockKnob, numberKnob, enumSwitch, booleanSwitch]) {
+      expect(acceptsValue(control, undefined)).toBe(false)
+      expect(acceptsValue(control, null)).toBe(false)
+      expect(acceptsValue(control, {})).toBe(false)
+      expect(acceptsValue(control, [1, 2])).toBe(false)
+      expect(acceptsValue(control, () => 1)).toBe(false)
+    }
   })
 })

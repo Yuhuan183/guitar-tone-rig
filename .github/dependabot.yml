@@ -1,0 +1,23 @@
+# Security review found no vulnerable dependencies, but that is a fact about one
+# afternoon. Grouped and monthly so the repository gets told without being
+# buried; security advisories still arrive as separate, immediate PRs.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      dev-dependencies:
+        dependency-type: development
+      production-dependencies:
+        dependency-type: production
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ['*']

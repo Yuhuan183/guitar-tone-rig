@@ -289,6 +289,21 @@ for (const device of devices.values()) {
 
 if (rig.deviceCatalog !== 'devices.json') errors.push(`rig.deviceCatalog 應為 devices.json`)
 
+// README states the rig version and status on the repository front page, which
+// is the first thing a visitor reads and the last thing anyone remembers to
+// update. It was already one release behind when this check was written.
+{
+  const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8')
+  for (const [field, value] of [
+    ['rigVersion', rig.rigVersion],
+    ['status', rig.status],
+  ]) {
+    if (!readme.includes(`\`${value}\``)) {
+      errors.push(`README.md: 沒有提到 rig.json 目前的 ${field} \`${value}\``)
+    }
+  }
+}
+
 // device-guides.json is knowledge, not decoration: hold it to the same contract.
 for (const [deviceId, guide] of Object.entries(guidesDocument.guides)) {
   const device = devices.get(deviceId)

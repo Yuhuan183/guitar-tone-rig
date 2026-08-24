@@ -436,7 +436,9 @@
               },
               "url": {
                 "type": "string",
-                "format": "uri"
+                "format": "uri",
+                "description": "Rendered straight into an href. format: uri alone would accept javascript:, so the scheme is pinned here.",
+                "pattern": "^https://"
               },
               "notes": {
                 "type": "string",

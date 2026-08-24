@@ -10,7 +10,7 @@ export { catalog, categoryLabel, deviceById, guides, presetById, rig } from './d
 export { groupSettingsBySection, mergeSettings, resolvePreset } from './merge.mjs'
 export type { ControlEntry, SectionGroup } from './merge.mjs'
 export { CLOCK_MAX_STEP, CLOCK_MIN_STEP, clockToStep, isClock, stepToClock } from './clock.mjs'
-export { formatSetting, nudge, positionValue, settingValue, valuePosition } from './value'
+export { acceptsValue, formatSetting, nudge, positionValue, settingValue, valuePosition } from './value'
 export { pad2, truncate } from './format'
 export type { Adjacent } from './chain'
 

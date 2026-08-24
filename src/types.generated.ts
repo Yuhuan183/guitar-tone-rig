@@ -175,6 +175,9 @@ export interface OpenSlot {
      * The one-line reason this candidate is on the list at all.
      */
     verdict: string
+    /**
+     * Rendered straight into an href. format: uri alone would accept javascript:, so the scheme is pinned here.
+     */
     url: string
     notes: string
   }[]
@@ -380,5 +383,8 @@ export interface Guide {
 }
 export interface Source {
   label: string
+  /**
+   * Rendered straight into an href. format: uri alone would accept javascript:, so the scheme is pinned here.
+   */
   url: string
 }

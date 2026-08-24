@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { ScalarValue, UserOverrides } from '../types'
-import { deviceById, presetById, rig } from '../lib/rig'
+import { acceptsValue, deviceById, presetById, rig } from '../lib/rig'
 
 interface RigState {
   selectedPresetId: string
@@ -20,8 +20,11 @@ const defaultPresetId = rig.presets[0]?.id ?? ''
 
 /**
  * Drops overrides pointing at presets, devices or controls that no longer
- * exist. Without this a rename in the JSON leaves invisible state that the
- * workbench keeps writing to but never shows.
+ * exist, and values the control could not hold. Without the first a rename in
+ * the JSON leaves invisible state that the workbench keeps writing to but never
+ * shows; without the second, anything at all in this localStorage key reaches
+ * the UI — and on GitHub Pages the origin is shared with every other project
+ * page on the same account, so this app is not the only writer.
  */
 function pruneOverrides(overrides: UserOverrides): UserOverrides {
   const presetIds = new Set(rig.presets.map((preset) => preset.id))
@@ -34,9 +37,12 @@ function pruneOverrides(overrides: UserOverrides): UserOverrides {
     for (const [deviceId, controls] of Object.entries(devices ?? {})) {
       const device = deviceById.get(deviceId)
       if (!device) continue
-      const controlIds = new Set(device.controls.map((control) => control.id))
+      const controlsById = new Map(device.controls.map((control) => [control.id, control]))
       const keptControls = Object.fromEntries(
-        Object.entries(controls ?? {}).filter(([controlId]) => controlIds.has(controlId)),
+        Object.entries(controls ?? {}).filter(([controlId, value]) => {
+          const control = controlsById.get(controlId)
+          return control !== undefined && acceptsValue(control, value)
+        }),
       )
       if (Object.keys(keptControls).length) keptDevices[deviceId] = keptControls
     }
@@ -106,6 +112,7 @@ export const useRigStore = create<RigState>()(
         if (!state) return
         state.overrides = pruneOverrides(state.overrides)
         if (!presetById.has(state.selectedPresetId)) state.selectedPresetId = defaultPresetId
+        state.compareMode = state.compareMode === true
       },
     },
   ),

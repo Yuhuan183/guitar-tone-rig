@@ -1,17 +1,55 @@
 # Guitar Tone Rig
 
-React 是互動介面；`data/` 是可維護的設定來源。Zustand 只保存瀏覽器內的試調值，不會直接改寫 JSON——但工作台可以把試調結果匯出成可貼回 JSON 的區塊。
+一副吉他效果鏈的知識庫，做成可以互動的樣子。訊號怎麼走、每一級在做什麼、每組音色的旋鈕停在哪裡——全部從 JSON 產生，包括畫面上那些效果器示意圖。
 
-## Frontend
+**線上版：<https://yuhuan183.github.io/guitar-tone-rig/>**（純靜態，不需要帳號，關掉分頁不留任何東西在伺服器上）
 
-- React + TypeScript + Vite
-- Zustand persisted store，含版本號與 rehydrate 時的孤兒 override 清理
-- Tailwind CSS v4；手寫 component class 一律放在 `@layer components`
-- Hash Router 加相對 `base`，同一份 build 可從網域根目錄、`/guitar-tone-rig/` 這種子路徑或 `file://` 開啟
-- dev／preview port 由專案路徑推導後探測，見下方「Ports」
-- 字型自 host（`@fontsource`），離線不掉字
+![總覽頁：效果盤與訊號鏈](docs/dashboard.jpg)
 
-## Files
+## 這是什麼
+
+調音色最麻煩的不是不知道旋鈕要轉去哪，而是「上次調到哪、為什麼那樣調」散在筆記、截圖和記憶裡。這個專案把那份知識收進 `data/` 的四份 JSON，介面只是它的一種讀法：
+
+- **效果盤與訊號鏈**——五級效果器加輸入與監聽端點，每一顆都是進到它參數頁的入口。
+- **音色工作台**——選一組音色，逐級調參數。旋鈕角度是該音色的實際設定值，不是裝飾。
+- **效果器頁**——調節取向、Troubleshooting、每個控制項的說明、信心邊界，以及原廠資料來源。
+- **匯出回 JSON**——瀏覽器裡的試調整理成 Before／After，產生可以直接貼回 `data/rig.json` 的區塊。試調過的值一律標記 `needs-calibration`：在瀏覽器裡調過，不等於用耳朵確認過。
+
+微調只存在你自己的瀏覽器（localStorage），不會改動 repo 裡的 JSON，也不會送到任何地方。
+
+## 效果器示意圖是資料畫出來的
+
+盤上那些效果器是 **SVG 示意圖，不是產品照片**，每一顆都從 `data/devices.json` 產生：
+
+- 控制項的 `surface`（`panel` / `software` / `derived`）決定它畫不畫在機殼上，`PANEL_SHAPES` 決定它畫成旋鈕、撥桿、腳踏開關還是 LED 表頭。兩邊對不起來 `npm run check` 會擋。
+- 旋鈕角度取自目前音色的實際值，切換音色會轉過去，拖曳時即時跟著動。
+- 這組音色沒指定的控制項畫成暗色，不會停在正中央假裝有值。
+
+選示意圖而不是照片的理由就在這裡：資料改了，圖不可能不跟著改。
+
+## 快速開始
+
+```sh
+git clone https://github.com/Yuhuan183/guitar-tone-rig.git
+cd guitar-tone-rig
+npm install
+npm run dev
+```
+
+Port 不寫死。`scripts/pick-port.mjs` 以專案路徑的 hash 在 **20000–39999** 取一個基準 port，再實際 bind 測試：同一個 checkout 每次都是同一個 port（書籤不會失效），不同 checkout 不會互撞，已被占用的會往上跳過。要指定就 `PORT=3000 npm run dev` 或 `PREVIEW_PORT=4000 npm run preview`；啟動時 Vite 會印出實際位址。
+
+## 頁面
+
+| 路徑            | 用途                                                                             |
+| --------------- | -------------------------------------------------------------------------------- |
+| `/`             | 現在載入哪一組音色、訊號鏈長什麼樣。鏈上每一級就是效果器的入口。                 |
+| `/presets`      | 音色工作台：選音色 → 選一級 → 調參數 → 匯出回 JSON。                             |
+| `/signal-chain` | Gain Stacking、Gate 拓樸、電源與接地、安全規則，以及暫時不放進鏈上的 Gain。      |
+| `/devices/:id`  | 單一效果器的參數、調節取向、診斷、信心邊界與原廠來源；底部可直接走到前／後一級。 |
+
+## 資料是唯一的來源
+
+`schemas/` 的 JSON Schema 2020-12 是契約，型別由它產生，內容由它驗證：
 
 | 路徑                      | 內容                                                             |
 | ------------------------- | ---------------------------------------------------------------- |
@@ -22,99 +60,32 @@ React 是互動介面；`data/` 是可維護的設定來源。Zustand 只保存�
 | `schemas/`                | JSON Schema 2020-12，是型別與驗證的唯一契約。                    |
 | `src/types.generated.ts`  | 由 `schemas/` 產生，請勿手改。                                   |
 
-```sh
-npm install
-npm run dev
-npm run build
-```
+`npm run validate:data` 不只跑 schema，也檢查 schema 表達不了的東西：這個 `controlId` 在那台機器上存在嗎、每個 category 都有標籤嗎、同一個 URL 有沒有出現在兩個地方。
 
-## 頁面
+## 想動手改
 
-三個目的地，加上效果器詳細頁：
+1. **效果器新增控制項**：改 `data/devices.json`，並確認它的 `section` 已在該效果器的 `sections` 宣告。
+2. **音色改值**：改 `data/rig.json`。
+3. **器材知識**（原則、Troubleshooting、控制項說明、互動儀表）：改 `data/device-guides.json`，不要寫進 React 元件。
+4. **改了 `schemas/`**：接著跑 `npm run generate:types`。
+5. **實機測試**：先記進 `data/tuning-log.json`。只在聽感穩定且測試條件完整時，才把 Setting 或 Preset 標記為 `verified`。
+6. **送出前**：`npm run check`。
 
-| 路徑            | 用途                                                                             |
-| --------------- | -------------------------------------------------------------------------------- |
-| `/`             | 現在載入哪一組音色、訊號鏈長什麼樣。鏈上每一級就是效果器的入口。                 |
-| `/presets`      | 音色工作台：選音色 → 選一級 → 調參數 → 匯出回 JSON。                             |
-| `/signal-chain` | Gain Stacking、Gate 拓樸、電源與接地、安全規則，以及暫時不放進鏈上的 Gain。      |
-| `/devices/:id`  | 單一效果器的參數、調節取向、診斷、信心邊界與原廠來源；底部可直接走到前／後一級。 |
-
-原本的 `/data-model`、`/references`、`/alternatives` 已移除——那三頁是「跟某個東西有關、卻放在別處」的集散地。參數表示法與狀態定義進了工作台的說明區，各器材的信心邊界與原廠連結進了該器材頁，Gate 與備選 Gain 的連結進了訊號鏈頁。同一個 URL 不會再出現在兩個地方（`validate:data` 會擋）。
-
-## 面板示意圖
-
-效果盤與效果器頁上的圖是 **SVG 示意圖，不是產品照片**，由 `data/devices.json` 產生：
-
-- 每個控制項有 `surface`（`panel` / `software` / `derived`）決定它畫不畫在機殼上；`src/lib/panel.ts` 的 `PANEL_SHAPES` 決定它畫成旋鈕、撥桿、腳踏開關還是 LED 表頭。兩者不同步時 `validate:app` 會失敗。
-- **旋鈕角度取自目前音色的實際設定值**，切換音色時會轉過去，在工作台拖滑桿時也會即時跟著動。
-- 這個音色沒有指定的控制項畫成暗色，不會停在正中央假裝有值。
-- 機殼比例與顏色在 `appearance`，是示意用的，可以自行調整。
-
-因為圖是資料產生的，它不可能跟資料脫節——這是選示意圖而不是照片的主要理由。
-
-## Ports
-
-Port 不寫死，也不用 Vite 從 5173 往上加——那只會撞到下一個專案。`scripts/pick-port.mjs`
-以專案路徑的 hash 在 **20000–39999** 取一個基準 port（避開常用的 3000/5173/8080 一帶，
-也避開 macOS/Linux 的 ephemeral 範圍 49152–65535），再實際嘗試 bind：
-
-- **同一個 checkout 每次都是同一個 port** — 書籤、proxy 設定不會失效。
-- **不同 checkout 是不同 port** — 兩個專案同時開不會撞。
-- **已經有人在聽的 port 會被跳過** — 往上探測最多 64 個。
-
-要指定就用環境變數：
-
-```sh
-PORT=3000 npm run dev
-PREVIEW_PORT=4000 npm run preview
-```
-
-啟動時 Vite 會印出實際使用的位址。
-
-## Maintenance contract
-
-1. 效果器新增控制項：先改 `data/devices.json`，並確認它的 `section` 已在該效果器的 `sections` 宣告。
-2. 音色改值：改 `data/rig.json`。
-3. 器材知識（原則、Troubleshooting、控制項說明）：改 `data/device-guides.json`，不要寫進 React 元件。
-4. 改了 `schemas/` 之後執行 `npm run generate:types`。
-5. 每次實機測試：先記 `data/tuning-log.json`。
-6. 只在聽感穩定且測試條件完整時，把 Setting 或 Preset 改為 `verified`。
-7. 修改後執行：
-
-   ```sh
-   npm run check
-   ```
-
-## 從工作台回寫 JSON
-
-工作台的「把本機微調寫回 JSON」會把這組音色的本機試調整理成 Before／After 表，並產生兩種可直接貼回的區塊：
-
-- **rig.json 覆寫區塊**：貼進對應 preset 的 `settings`。`status` 一律輸出 `needs-calibration`——在瀏覽器裡調過不等於用耳朵確認過。
-- **tuning-log 測試紀錄**：補上吉他、拾音器、監聽、音量與保留／退回理由後，加進 `sessions`。
-
-查看合併後的完整 Preset：
+看合併後的完整 Preset：
 
 ```sh
 node scripts/show-preset.mjs mayer-asato-clean
 ```
 
-## 架構
+## 技術與檢查
 
-模組分層與相依方向見 [`docs/architecture.md`](docs/architecture.md)。重點：`src/lib/` 的領域邏輯全部把資料當參數收，只有 `lib/data.ts` 碰 JSON，`lib/rig.ts` 是唯一的組裝點。測試直接測純模組，不必載入真實 rig。
+React 19 + TypeScript + Vite，Tailwind CSS v4，Zustand（只存瀏覽器內的試調值），Hash Router。字型自 host（`@fontsource`），沒有任何第三方請求——沒有分析工具、沒有 CDN、沒有 runtime fetch，資料在 build 時就進了 bundle。
 
-## RWD
+模組分層與相依方向見 [`docs/architecture.md`](docs/architecture.md)：`src/lib/` 的領域邏輯全部把資料當參數收，只有 `lib/data.ts` 碰 JSON，`lib/rig.ts` 是唯一組裝點，所以測試直接測純模組，不必載入真實 rig。
 
-所有隨視窗寬度變化的值集中在 `src/lib/responsive.ts`。一個 scale 只宣告「在哪個視窗寬度該是多少」，`clamp()` 由程式算出來，不是手調 `vw` 係數：
+所有隨視窗寬度變化的值集中在 `src/lib/responsive.ts`，一個 scale 只宣告「在哪個視窗寬度該是多少」，`clamp()` 由 `npm run generate:responsive` 算出來，不是手調 `vw` 係數。
 
-```ts
-'pedal-board': { min: 44, max: 66 }   // 每個機殼單位幾 px
-```
-
-`npm run generate:responsive` 產生 `src/responsive.generated.css`（`--scale-*` 與 `--breakpoint-*`）。CSS 用 `var(--scale-pedal-board)`，需要數字的元件用 `useFluid('pedal-board')`，兩邊讀同一份登錄表。改了 `responsive.ts` 沒重新產生，`npm run check` 會擋。
-
-## Checks
-
-`npm run check` 依序執行下列項目；CI（`.github/workflows/check.yml`）與部署（`.github/workflows/deploy.yml`）跑同一組，紅的 main 不會上線：
+`npm run check` 依序跑下面這些；CI（`.github/workflows/check.yml`）與部署（`.github/workflows/deploy.yml`）跑同一組，紅的 `main` 不會上線：
 
 | 指令                         | 檢查內容                                                                                             |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------- |
@@ -123,28 +94,18 @@ node scripts/show-preset.mjs mayer-asato-clean
 | `npm run typecheck`          | `tsc -b`。                                                                                           |
 | `npm run lint`               | ESLint（含 react-hooks）。                                                                           |
 | `npm run format:check`       | Prettier。                                                                                           |
-| `npm run validate:app`       | 路由與本機連結，加上 `design-system/` 可機械驗證的條款（見下）。                                     |
+| `npm run test:coverage`      | Vitest，含覆蓋率下限。                                                                               |
+| `npm run validate:app`       | 路由與本機連結，加上 `design-system/` 可機械驗證的條款。                                             |
 
-`validate:app` 會擋掉的 design system 違規：
+`validate:app` 擋掉的不是風格偏好，是會真的壞掉的東西：手寫 component class 沒包在 `@layer components`（會壓過 Tailwind utilities，`lg:hidden` 失效）、對比不足 3:1／4.5:1、某條路由在手機上沒有導覽入口、`src/lib/responsive.ts` 以外手寫 `clamp(... vw ...)`、用 `0{n}` 寫死補零而不是 `pad2()`，以及 `panel.ts` 或 `value.ts` 漏處理 schema 裡宣告過的某個 `type` 或 `valueType`。
 
-- 手寫 component class 沒有包在 `@layer components`（會壓過 Tailwind utilities，`lg:hidden` 會失效）。
-- 宣告 `justify-content`／`align-items` 卻沒有 flex/grid display。
-- 邊界、focus ring 與各級文字色對四層 surface 的實算對比不足（3:1／4.5:1）。
-- 在 `src/lib/responsive.ts` 以外手寫 `clamp(... vw ...)`。
-- 元件裡用 `text-[Npx]` 之類的任意字級。
-- `font-size` 不在 `--text-*` 尺度內。
-- 某條路由在手機上沒有導覽入口（sidebar 與 footer 都是 `lg` 以上才顯示）。
-- 用 `0{n}` 寫死補零，而不是 `pad2()`。
+## 部署
 
-## Deploy
+推上 `main` 就由 `.github/workflows/deploy.yml` 跑 `npm run check` 和 `npm run build`，再把 `dist/` 發到 GitHub Pages。Pages 的 source 是 GitHub Actions，不用 `gh-pages` 分支——`dist/` 在 `.gitignore` 裡，本來就不進版控。
 
-推上 `main` 就由 `.github/workflows/deploy.yml` 跑 `npm run check`、`npm run build`，再把 `dist/` 發到 GitHub Pages：
-
-<https://yuhuan183.github.io/guitar-tone-rig/>
-
-Pages 的 source 設為 GitHub Actions，不使用 `gh-pages` 分支——`dist/` 在 `.gitignore` 裡，本來就不進版控。子路徑能運作是因為 `vite.config.ts` 的 `base: './'`：資產路徑相對於頁面，而 Hash Router 載入後不會再改動 URL 路徑。
+`vite.config.ts` 的 `base: './'` 讓同一份 build 可以從網域根目錄、`/guitar-tone-rig/` 這種子路徑，或直接 `file://` 開啟：資產路徑相對於頁面，而 Hash Router 載入後不會再改動 URL 路徑。
 
 ## 版本
 
-- `rigVersion`（`data/rig.json`）記錄這副 rig 的設定版本，目前 `0.1.0`，狀態 `draft-unverified`。
+- `rigVersion`（`data/rig.json`）是這副 rig 的設定版本，目前 `0.4.0`，狀態 `draft-unverified`——還沒實機驗證過。
 - `package.json` 的 `version` 是應用程式版本，與 `rigVersion` 各自獨立遞增。

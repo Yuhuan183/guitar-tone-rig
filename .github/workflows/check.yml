@@ -5,6 +5,12 @@ on:
     branches: [main]
   pull_request:
 
+# `npm ci` runs dependency lifecycle scripts, and this workflow runs on pull
+# requests from anywhere. Declare the token read-only here rather than inherit
+# whatever the repository default happens to be.
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest

@@ -3,6 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      GitHub Pages sends no security headers of its own, and a meta CSP is the
+      only lever a static site has. Nothing here is loaded from a third party —
+      fonts are self-hosted, there is no analytics and no runtime fetch — so the
+      allowlist is 'self' and the value of the policy is that a compromised
+      dependency inside the bundle still cannot reach an outside origin.
+      'unsafe-inline' is needed for style only: React writes the knob angle and
+      the fluid type scale as inline style attributes.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="theme-color" content="#090b0d" />
     <meta name="description" content="可互動、可維護的吉他效果鏈與音色參數知識庫。" />
     <title>Guitar Rig Control Room</title>

@@ -35,6 +35,27 @@ export function formatSetting(setting?: Setting): string {
   return setting.target ?? '未設定'
 }
 
+/**
+ * Could this value have come from this control? Used to filter state read back
+ * out of localStorage, which on GitHub Pages is one origin shared with every
+ * other project page on the same account — so what comes back is not
+ * necessarily what this app wrote.
+ */
+export function acceptsValue(control: Control, value: unknown): value is ScalarValue {
+  if (control.valueType === 'clock') return isClock(value)
+  if (control.valueType === 'boolean') return typeof value === 'boolean'
+  if (control.valueType === 'number') {
+    return (
+      typeof value === 'number' &&
+      Number.isFinite(value) &&
+      value >= (control.min ?? 0) &&
+      value <= (control.max ?? 100)
+    )
+  }
+  if (control.valueType === 'enum') return (control.options ?? []).some((option) => option === value)
+  return false
+}
+
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value))
 
 /**
