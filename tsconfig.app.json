@@ -5,6 +5,11 @@
     "useDefineForClassFields": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
+    // Named, not inherited. Without this every package under node_modules/@types
+    // is ambient, which is how `process` became available to application source
+    // that must never touch it. vite/client is what declares `*.css` and the
+    // other asset imports Vite resolves at build time.
+    "types": ["vite/client"],
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
@@ -18,5 +23,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  // Tests get their own project (tsconfig.test.json) because they legitimately
+  // need node globals and the application source must not have them.
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/__tests__/**/*", "src/test-setup.ts"]
 }
