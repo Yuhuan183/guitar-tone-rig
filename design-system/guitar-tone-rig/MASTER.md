@@ -1,4 +1,4 @@
-# YUHUAN Rig Control Console — Design System
+# Guitar Tone Rig — Design System
 
 **Updated:** 2026-08-21 (refinement pass)
 **Category:** Audio equipment control dashboard / personal rig utility
