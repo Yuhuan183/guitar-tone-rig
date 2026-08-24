@@ -25,8 +25,8 @@ function BrandLockup() {
         <Gauge aria-hidden="true" size={19} />
       </span>
       <span>
-        <span className="brand-kicker">YUHUAN RIG</span>
-        <span className="brand-title">Control Console</span>
+        <span className="brand-kicker">CONTROL CONSOLE</span>
+        <span className="brand-title">Guitar Tone Rig</span>
       </span>
     </NavLink>
   )
