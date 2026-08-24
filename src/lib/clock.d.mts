@@ -1,3 +1,4 @@
+export const CLOCK_PATTERN: RegExp
 export const CLOCK_MIN_STEP: number
 export const CLOCK_MAX_STEP: number
 

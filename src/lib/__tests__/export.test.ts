@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { diffPreset, toRigPatch, toTuningSession } from '../export'
 import { rig } from '../data'
 
@@ -49,6 +49,16 @@ describe('toRigPatch', () => {
 })
 
 describe('toTuningSession', () => {
+  // A session is dated by the day the player was at the amp, so every
+  // expectation below is only meaningful against a known local timezone.
+  const hostTimeZone = process.env.TZ
+  beforeEach(() => {
+    process.env.TZ = 'Asia/Taipei'
+  })
+  afterEach(() => {
+    process.env.TZ = hostTimeZone
+  })
+
   it('produces a skeleton with the pairs filled and the judgement left blank', () => {
     const diffs = diffPreset(preset, { [preset.id]: { cali76: { attack: '12:00' } } })
     const session = toTuningSession(preset, diffs, new Date('2026-08-21T00:00:00Z'))
@@ -66,6 +76,18 @@ describe('toTuningSession', () => {
     vi.setSystemTime(new Date('2030-01-02T00:00:00Z'))
     expect(toTuningSession(preset, []).date).toBe('2030-01-02')
     vi.useRealTimers()
+  })
+
+  it('dates a session by the local day it happened, not by UTC', () => {
+    // 01:30 on the 25th in Taipei is still mid-morning on the 24th in
+    // California. Reading the instant as UTC gets the Taipei case wrong.
+    const at = new Date('2026-08-24T17:30:00Z')
+
+    expect(toTuningSession(preset, [], at).date).toBe('2026-08-25')
+    expect(toTuningSession(preset, [], at).id).toBe(`2026-08-25-${preset.id}`)
+
+    process.env.TZ = 'America/Los_Angeles'
+    expect(toTuningSession(preset, [], at).date).toBe('2026-08-24')
   })
 })
 
@@ -86,17 +108,40 @@ describe('clipboard and download', () => {
     vi.unstubAllGlobals()
   })
 
-  it('hands the file to the browser and releases the blob url', async () => {
+  it('clicks an anchor that is in the document, and takes it out again', async () => {
     const { downloadText } = await import('../export')
     const createObjectURL = vi.fn().mockReturnValue('blob:x')
-    const revokeObjectURL = vi.fn()
-    vi.stubGlobal('URL', { ...URL, createObjectURL, revokeObjectURL })
-    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+    vi.stubGlobal('URL', { ...URL, createObjectURL, revokeObjectURL: vi.fn() })
+    let connectedAtClick: boolean | undefined
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+      this: HTMLAnchorElement,
+    ) {
+      // Firefox starts no download from a detached anchor, so this is the
+      // difference between a working download and silence.
+      connectedAtClick = this.isConnected
+    })
 
     downloadText('rig-patch.json', '{}')
 
     expect(createObjectURL).toHaveBeenCalled()
-    expect(click).toHaveBeenCalled()
+    expect(connectedAtClick).toBe(true)
+    expect(document.querySelector('a[download]')).toBeNull()
+    click.mockRestore()
+    vi.unstubAllGlobals()
+  })
+
+  it('keeps the blob url alive until the browser has had a chance to read it', async () => {
+    const { downloadText } = await import('../export')
+    const revokeObjectURL = vi.fn()
+    vi.stubGlobal('URL', { ...URL, createObjectURL: vi.fn().mockReturnValue('blob:x'), revokeObjectURL })
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+
+    downloadText('rig-patch.json', '{}')
+    // Revoking in the same task can hand the browser a url that is already
+    // gone, which downloads a 0-byte file or nothing at all.
+    expect(revokeObjectURL).not.toHaveBeenCalled()
+
+    await new Promise((resolve) => setTimeout(resolve, 0))
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:x')
     click.mockRestore()
     vi.unstubAllGlobals()

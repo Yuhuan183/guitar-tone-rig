@@ -3,7 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Ajv2020 from 'ajv/dist/2020.js'
 import addFormats from 'ajv-formats'
-import { clockToStep, isClock } from '../src/lib/clock.mjs'
+import { CLOCK_PATTERN, clockToStep, isClock } from '../src/lib/clock.mjs'
 
 /**
  * Two layers of checking:
@@ -98,10 +98,22 @@ for (const device of devices.values()) {
   }
 }
 
-const clockPattern = /^(0[7-9]|1[0-7]):(?:00|30)$/
+// JSON Schema cannot import the scale, so rig.schema.json spells the pattern
+// out a second time. Hold the two together rather than discover the drift when
+// the app accepts a value the schema rejects.
+{
+  const schemaPattern = readJson('schemas/rig.schema.json').$defs.clock.pattern
+  if (schemaPattern !== CLOCK_PATTERN.source) {
+    errors.push(
+      `rig.schema.json: $defs.clock.pattern 與 clock.mjs 的 CLOCK_PATTERN 不同（${schemaPattern} vs ${CLOCK_PATTERN.source}）`,
+    )
+  }
+}
 
 const validateScalar = (deviceId, control, value, location) => {
-  if (control.valueType === 'clock' && !clockPattern.test(String(value))) {
+  // isClock, not a second copy of the pattern: widen or narrow the scale in
+  // clock.mjs and the app and this validator have to move together.
+  if (control.valueType === 'clock' && !isClock(value)) {
     errors.push(`${location}: ${deviceId}.${control.id} 不是 30 分鐘刻度的鐘點值：${value}`)
   }
   if (control.valueType === 'number') {
@@ -287,6 +299,39 @@ for (const [deviceId, guide] of Object.entries(guidesDocument.guides)) {
   const controlIds = new Set(device.controls.map((control) => control.id))
   for (const controlId of Object.keys(guide.controlNotes ?? {})) {
     if (!controlIds.has(controlId)) errors.push(`device-guides.${deviceId}: 找不到 controlId ${controlId}`)
+  }
+
+  // The meter simulates one real control, so it has to name one that exists and
+  // stay inside the range that control declares. DevicePage renders it purely
+  // from this block; nothing in the page knows which device owns a meter.
+  if (guide.meter) {
+    const where = `device-guides.${deviceId}.meter`
+    const control = device.controls.find((item) => item.id === guide.meter.controlId)
+    if (!control) {
+      errors.push(`${where}: 找不到 controlId ${guide.meter.controlId}`)
+    } else if (control.type !== 'readout') {
+      errors.push(`${where}: ${control.id} 是 ${control.type}，儀表只能讀 readout`)
+    } else {
+      const min = control.min ?? 0
+      if (guide.meter.max <= min || guide.meter.max > control.max) {
+        errors.push(`${where}: max ${guide.meter.max} 不在 ${control.id} 的 ${min}–${control.max} 之內`)
+      }
+      const marks = [
+        ...guide.meter.quickValues.map((value) => ['quickValues', value]),
+        ...guide.meter.bands
+          .filter((band) => band.upTo !== undefined)
+          .map((band) => ['bands.upTo', band.upTo]),
+      ]
+      for (const [field, value] of marks) {
+        if (value < min || value > guide.meter.max) {
+          errors.push(`${where}.${field}: ${value} 不在 ${min}–${guide.meter.max} 之內`)
+        }
+      }
+    }
+    // Without an open last band a value past every upTo reads as no text at all.
+    if (guide.meter.bands.at(-1).upTo !== undefined) {
+      errors.push(`${where}.bands: 最後一段必須省略 upTo，否則高值沒有對應說明`)
+    }
   }
 
   // A comparison names another device by id, so it cannot survive that device

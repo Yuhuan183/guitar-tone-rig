@@ -1,5 +1,6 @@
 import { RotateCcw } from 'lucide-react'
 import type { CSSProperties, ReactNode } from 'react'
+import { knobAngle } from '../../lib/panel'
 import {
   CLOCK_MAX_STEP,
   clockToStep,
@@ -221,7 +222,9 @@ function pickRenderer(control: Control, setting: Setting): RendererKey {
 }
 
 function Knob({ control, value }: { control: Control; value: ScalarValue }) {
-  const style = { '--knob-angle': `${-135 + valuePosition(control, value) * 270}deg` } as CSSProperties
+  // knobAngle, not the sweep written out again: the drawn SVG knob in
+  // pedal/parts.tsx reads from the same one, so they cannot drift apart.
+  const style = { '--knob-angle': `${knobAngle(valuePosition(control, value))}deg` } as CSSProperties
   return (
     <div className="knob" style={style} aria-hidden="true">
       <span />

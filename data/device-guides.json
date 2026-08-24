@@ -23,6 +23,19 @@
         "attack": "決定多快開始壓縮；偏慢保留起音，過快會削弱 Pick Attack。",
         "release": "決定多久停止壓縮；中快可在音符間恢復，過慢會讓連續音符持續被壓住。"
       },
+      "meter": {
+        "controlId": "gr_peak",
+        "title": "Cali76 · Gain Reduction",
+        "sliderLabel": "模擬 Gain Reduction",
+        "max": 20,
+        "quickValues": [0, 3, 5, 8, 12],
+        "bands": [
+          { "upTo": 2, "note": "壓縮很輕，原始動態幾乎完整保留。" },
+          { "upTo": 5, "note": "目標區：一般彈奏約亮兩顆，最重撥弦瞬間碰到第三顆。" },
+          { "upTo": 8, "note": "壓縮已明顯，可能開始削弱 Pick Attack。" },
+          { "note": "壓縮偏深；always-on 通常太扁，也會提高底噪。" }
+        ]
+      },
       "facts": ["Cali76 使用 Buffer Output，因此後面的 NOTADÜMBLË Clean Input 阻抗變化可能比吉他直入時更細微。"],
       "chainRole": [
         { "job": "把 Clean／Low Gain 的小音符、滑音與延音撐起來。", "avoid": "不要當成明顯的壓縮特效；Gain Reduction 長時間超過 5 dB 就是過頭。" }

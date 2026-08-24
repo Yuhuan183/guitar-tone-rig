@@ -14,7 +14,7 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import { ChainEvaluation, ComparisonTable } from '../components/DeviceEvaluation'
 import { DeviceParameters } from '../components/parameters/DeviceParameters'
 import { PedalGraphic } from '../components/pedal/PedalGraphic'
-import { GainReductionMeter } from '../components/GainReductionMeter'
+import { GuideMeter } from '../components/GuideMeter'
 import { ParameterLegend } from '../components/parameters/ParameterControl'
 import {
   DataTable,
@@ -62,10 +62,21 @@ export function DevicePage() {
   const deviceOverrides = useRigStore((state) =>
     device ? (state.overrides[preset.id]?.[device.id] ?? EMPTY_OVERRIDES) : EMPTY_OVERRIDES,
   )
+  /**
+   * Merges every voice over the whole rig, so it must not run on each render —
+   * dragging a knob on the figure re-renders this page on every pointermove.
+   */
+  const voices = useMemo(
+    () =>
+      device ? voicesEngaging(device, rig.presets, rig.baseline.settings) : { engaged: [], bypassed: [] },
+    [device],
+  )
 
   if (!device) return <Navigate to="/" replace />
 
   const guide = guides.guides[device.id]
+  const meter = guide?.meter
+  const meterControl = meter ? device.controls.find((item) => item.id === meter.controlId) : undefined
   /**
    * A reference device is studied, not played: it has no chain position, no
    * settings in any voice, and nothing to export, so the whole tuning half of
@@ -74,7 +85,7 @@ export function DevicePage() {
   const isReference = device.placement === 'reference'
   const { previous, next, position, total } = adjacentStages(device.id)
   const bypassedHere = !isReference && panelLayout(device, settings, deviceOverrides).bypassed
-  const { engaged } = voicesEngaging(device, rig.presets, rig.baseline.settings)
+  const { engaged } = voices
 
   return (
     <div className="space-y-7">
@@ -150,7 +161,7 @@ export function DevicePage() {
           )}
         </Notice>
       )}
-      {device.id === 'cali76' && <GainReductionMeter />}
+      {meter && meterControl && <GuideMeter control={meterControl} meter={meter} />}
 
       {isReference ? (
         <section className="console-panel" aria-labelledby="evaluation-title">

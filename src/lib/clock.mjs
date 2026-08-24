@@ -9,7 +9,8 @@
 export const CLOCK_MIN_STEP = 0
 export const CLOCK_MAX_STEP = 21
 
-const CLOCK_PATTERN = /^(0[7-9]|1[0-7]):(?:00|30)$/
+/** Exported so validate-data can hold the schema's copy of it to this one. */
+export const CLOCK_PATTERN = /^(0[7-9]|1[0-7]):(?:00|30)$/
 
 export const isClock = (value) => typeof value === 'string' && CLOCK_PATTERN.test(value)
 

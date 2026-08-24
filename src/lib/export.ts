@@ -1,4 +1,4 @@
-import { deviceById, formatSetting, mergeSettings, rig, settingValue } from './rig'
+import { deviceById, formatSetting, mergeSettings, pad2, rig, settingValue } from './rig'
 import type { Preset, ScalarValue, Setting, SettingsMap, UserOverrides } from '../types'
 
 export interface OverrideDiff {
@@ -64,7 +64,9 @@ export function toRigPatch(preset: Preset, diffs: OverrideDiff[]) {
 
 /** A tuning-log session skeleton, pre-filled with the Before/After pairs. */
 export function toTuningSession(preset: Preset, diffs: OverrideDiff[], today = new Date()) {
-  const date = today.toISOString().slice(0, 10)
+  // The local day, not the UTC one: a session tuned at 01:30 in Taipei belongs
+  // to that morning, and toISOString would file it under the day before.
+  const date = `${today.getFullYear()}-${pad2(today.getMonth() + 1)}-${pad2(today.getDate())}`
   return {
     id: `${date}-${preset.id}`,
     date,
@@ -98,6 +100,11 @@ export function downloadText(filename: string, text: string) {
   const anchor = document.createElement('a')
   anchor.href = url
   anchor.download = filename
+  // Firefox starts no download from an anchor that is not in the document, and
+  // every browser reads the blob after this task returns — revoking the url on
+  // the next line would hand it one that is already gone.
+  document.body.append(anchor)
   anchor.click()
-  URL.revokeObjectURL(url)
+  anchor.remove()
+  setTimeout(() => URL.revokeObjectURL(url), 0)
 }

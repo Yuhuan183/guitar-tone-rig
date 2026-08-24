@@ -9,13 +9,25 @@ import { pickPort } from './scripts/pick-port.mjs'
 
 const projectRoot = dirname(fileURLToPath(import.meta.url))
 
+/**
+ * `data/` and `schemas/` are the contract the app is built from, so the built
+ * site publishes them as files too. Paths are resolved against this config's
+ * own directory, not the shell's cwd, so the build is the same wherever it is
+ * launched from.
+ */
 function copyKnowledgeFiles(): Plugin {
+  let output = resolve(projectRoot, 'dist')
   return {
     name: 'copy-knowledge-files',
+    // closeBundle also fires when the dev server closes; without this, Ctrl-C
+    // on `npm run dev` writes a dist/ that was never built.
+    apply: 'build',
+    configResolved(config) {
+      output = resolve(config.root, config.build.outDir)
+    },
     closeBundle() {
-      const output = resolve('dist')
-      cpSync(resolve('data'), resolve(output, 'data'), { recursive: true })
-      cpSync(resolve('schemas'), resolve(output, 'schemas'), { recursive: true })
+      cpSync(resolve(projectRoot, 'data'), resolve(output, 'data'), { recursive: true })
+      cpSync(resolve(projectRoot, 'schemas'), resolve(output, 'schemas'), { recursive: true })
     },
   }
 }

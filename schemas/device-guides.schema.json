@@ -120,6 +120,67 @@
             "minLength": 1
           }
         },
+        "meter": {
+          "description": "An interactive readout worth practising against, for a device that has one. Which control it simulates, and the copy that reads it — held here rather than in the page, which used to render it for one hardcoded device id.",
+          "type": "object",
+          "required": [
+            "controlId",
+            "title",
+            "sliderLabel",
+            "max",
+            "quickValues",
+            "bands"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "controlId": {
+              "description": "A readout control on the same device; validate-data checks it exists.",
+              "type": "string",
+              "minLength": 1
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sliderLabel": {
+              "type": "string",
+              "minLength": 1
+            },
+            "max": {
+              "description": "Top of the simulated sweep. Must sit inside the control’s own range.",
+              "type": "number"
+            },
+            "quickValues": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "number"
+              }
+            },
+            "bands": {
+              "description": "Read in order; the first band whose upTo the value fits wins. The last one omits upTo and catches the rest.",
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "object",
+                "required": [
+                  "note"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "upTo": {
+                    "type": "number"
+                  },
+                  "note": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
         "workflow": {
           "type": "object",
           "required": [

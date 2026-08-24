@@ -279,6 +279,29 @@ export interface Guide {
   controlNotes?: {
     [k: string]: string
   }
+  /**
+   * An interactive readout worth practising against, for a device that has one. Which control it simulates, and the copy that reads it — held here rather than in the page, which used to render it for one hardcoded device id.
+   */
+  meter?: {
+    /**
+     * A readout control on the same device; validate-data checks it exists.
+     */
+    controlId: string
+    title: string
+    sliderLabel: string
+    /**
+     * Top of the simulated sweep. Must sit inside the control’s own range.
+     */
+    max: number
+    quickValues: number[]
+    /**
+     * Read in order; the first band whose upTo the value fits wins. The last one omits upTo and catches the rest.
+     */
+    bands: {
+      upTo?: number
+      note: string
+    }[]
+  }
   workflow?: {
     title: string
     steps: string[]
