@@ -2,13 +2,17 @@ import type { CSSProperties, ReactNode } from 'react'
 import { knobAngle } from '../../lib/panel'
 import type { PanelItem } from '../../lib/panel'
 import { truncate } from '../../lib/format'
-import { formatSetting } from '../../lib/value'
 import type { PedalControlHandlers } from './usePedalControl'
 
 /**
  * Presentational SVG parts. Each takes a resolved PanelItem and a position in
  * enclosure units; none of them know about the store, the rig, or each other.
  */
+
+/** One phrasing of "which control, reading what" for every part that names one. */
+function itemLabel(item: PanelItem): string {
+  return `${item.control.label}\uff1a${item.value === undefined ? '未設定' : String(item.value)}`
+}
 
 interface PartProps {
   item: PanelItem
@@ -34,7 +38,7 @@ function Control({
   children: ReactNode
 }) {
   const interactive = Boolean(handlers)
-  const label = `${item.control.label}：${item.value === undefined ? '未設定' : String(item.value)}`
+  const label = itemLabel(item)
   return (
     <g
       transform={transform}
@@ -116,7 +120,7 @@ export function Meter({ item, x, y, width }: { item: PanelItem; x: number; y: nu
   const step = width / count
   return (
     <g transform={`translate(${x} ${y})`} aria-hidden="true">
-      <title>{formatSetting()}</title>
+      <title>{itemLabel(item)}</title>
       {Array.from({ length: count }, (_, index) => (
         <rect
           key={index}

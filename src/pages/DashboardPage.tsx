@@ -9,6 +9,47 @@ import { useRigStore, useSelectedPreset } from '../store/useRigStore'
 import type { Preset } from '../types'
 
 /**
+ * Module scope, not the render body: a component declared inside a render is a
+ * new type on every pass, so React would replace the whole radiogroup — and
+ * the focused card with it — each time a voice is selected.
+ */
+function VoiceCard({
+  item,
+  selected,
+  onSelect,
+}: {
+  item: Preset
+  selected: boolean
+  onSelect: (presetId: string) => void
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      onClick={() => onSelect(item.id)}
+      className={`voice-card ${selected ? 'voice-card-active' : ''}`}
+    >
+      <span className="flex items-center justify-between gap-2">
+        <Kicker tone="muted" size="sm">
+          SLOT {pad2(item.rigSlot)}
+        </Kicker>
+        <span className="font-display text-3xs uppercase tracking-[0.1em] text-muted">{item.status}</span>
+      </span>
+      <strong className="mt-2 block text-lg font-semibold text-ink">{item.name}</strong>
+      <span className="mt-1.5 block text-xs leading-6 text-muted">{item.target}</span>
+      <span className="mt-3 flex flex-wrap gap-1.5">
+        {item.genres.map((genre) => (
+          <span key={genre} className="tag">
+            {genre}
+          </span>
+        ))}
+      </span>
+    </button>
+  )
+}
+
+/**
  * The chain comes first — the board and the flow diagram are two views of the
  * same thing — then the voices this chain supports, then the way in to each
  * pedal's controls.
@@ -21,35 +62,6 @@ export function DashboardPage() {
     const byTier = (tier: Preset['tier']) => rig.presets.filter((item) => item.tier === tier)
     return [byTier('primary'), byTier('secondary')]
   }, [])
-
-  const VoiceCard = ({ item }: { item: Preset }) => {
-    const selected = item.id === preset.id
-    return (
-      <button
-        type="button"
-        role="radio"
-        aria-checked={selected}
-        onClick={() => selectPreset(item.id)}
-        className={`voice-card ${selected ? 'voice-card-active' : ''}`}
-      >
-        <span className="flex items-center justify-between gap-2">
-          <Kicker tone="muted" size="sm">
-            SLOT {pad2(item.rigSlot)}
-          </Kicker>
-          <span className="font-display text-3xs uppercase tracking-[0.1em] text-muted">{item.status}</span>
-        </span>
-        <strong className="mt-2 block text-lg font-semibold text-ink">{item.name}</strong>
-        <span className="mt-1.5 block text-xs leading-6 text-muted">{item.target}</span>
-        <span className="mt-3 flex flex-wrap gap-1.5">
-          {item.genres.map((genre) => (
-            <span key={genre} className="tag">
-              {genre}
-            </span>
-          ))}
-        </span>
-      </button>
-    )
-  }
 
   return (
     <div className="space-y-12">
@@ -113,7 +125,12 @@ export function DashboardPage() {
             <Kicker>主要</Kicker>
             <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {primary.map((item) => (
-                <VoiceCard key={item.id} item={item} />
+                <VoiceCard
+                  key={item.id}
+                  item={item}
+                  selected={item.id === preset.id}
+                  onSelect={selectPreset}
+                />
               ))}
             </div>
           </div>
@@ -121,7 +138,12 @@ export function DashboardPage() {
             <Kicker tone="muted">次要</Kicker>
             <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {secondary.map((item) => (
-                <VoiceCard key={item.id} item={item} />
+                <VoiceCard
+                  key={item.id}
+                  item={item}
+                  selected={item.id === preset.id}
+                  onSelect={selectPreset}
+                />
               ))}
             </div>
           </div>

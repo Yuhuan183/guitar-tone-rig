@@ -37,6 +37,14 @@ export function formatSetting(setting?: Setting): string {
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value))
 
+/**
+ * Detents run from the control's own minimum. A grid measured from zero lands
+ * off-scale whenever min is not a multiple of step, and leaves min itself
+ * unreachable — the one value a knob turned fully down has to produce.
+ */
+const snapToStep = (value: number, min: number, max: number, step: number) =>
+  Math.min(max, Math.max(min, min + Math.round((value - min) / step) * step))
+
 /** Normalises any control value to 0–1, for knob angles and range bands. */
 export function valuePosition(control: Control, value: ScalarValue): number {
   if (control.valueType === 'clock' && typeof value === 'string') {
@@ -51,6 +59,7 @@ export function valuePosition(control: Control, value: ScalarValue): number {
     const index = control.options.findIndex((option) => String(option) === String(value))
     return clamp01(Math.max(0, index) / Math.max(1, control.options.length - 1))
   }
+  if (control.valueType === 'boolean') return value === true ? 1 : 0
   return 0.5
 }
 
@@ -65,13 +74,13 @@ export function positionValue(control: Control, position: number): ScalarValue {
     const min = control.min ?? 0
     const max = control.max ?? 100
     const step = control.step ?? 1
-    const raw = min + p * (max - min)
-    return Math.min(max, Math.max(min, Math.round(raw / step) * step))
+    return snapToStep(min + p * (max - min), min, max, step)
   }
   if (control.valueType === 'enum' && control.options?.length) {
     const index = Math.round(p * (control.options.length - 1))
     return control.options[Math.min(control.options.length - 1, Math.max(0, index))]
   }
+  if (control.valueType === 'boolean') return p >= 0.5
   return p
 }
 
@@ -86,12 +95,15 @@ export function nudge(control: Control, value: ScalarValue | undefined, directio
     const max = control.max ?? 100
     const step = control.step ?? 1
     const numeric = typeof value === 'number' ? value : min + (max - min) / 2
-    return Math.min(max, Math.max(min, Math.round((numeric + direction * step) / step) * step))
+    return snapToStep(numeric + direction * step, min, max, step)
   }
   if (control.valueType === 'enum' && control.options?.length) {
     const index = control.options.findIndex((option) => String(option) === String(value))
     const next = Math.min(control.options.length - 1, Math.max(0, (index < 0 ? 0 : index) + direction))
     return control.options[next]
   }
+  // A two-position switch has one detent in each direction and no travel
+  // between them, so a press moves to that end and stays there.
+  if (control.valueType === 'boolean') return direction > 0
   return positionValue(control, current + direction * 0.05)
 }

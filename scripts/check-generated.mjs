@@ -26,10 +26,15 @@ const generated = [
 
 for (const { file, script, command, source } of generated) {
   const target = path.join(root, file)
-  const before = fs.existsSync(target) ? fs.readFileSync(target, 'utf8') : ''
+  const existed = fs.existsSync(target)
+  const before = existed ? fs.readFileSync(target, 'utf8') : ''
   execFileSync(process.execPath, [path.join(root, script)], { cwd: root, stdio: 'pipe' })
   if (fs.readFileSync(target, 'utf8') !== before) {
-    fs.writeFileSync(target, before)
+    // Leave the tree exactly as it was found. Writing `before` back when the
+    // artifact was absent would replace a missing file with an empty one, and
+    // the typecheck that follows would fail on that instead of on the message.
+    if (existed) fs.writeFileSync(target, before)
+    else fs.rmSync(target)
     console.error(`ERROR: ${file} 與 ${source} 不同步。執行：${command}`)
     process.exit(1)
   }

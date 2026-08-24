@@ -30,6 +30,26 @@ const enumSwitch: Control = {
   options: ['full-fat', 'bright-tight'],
 }
 
+const offsetKnob: Control = {
+  id: 'trim',
+  label: 'TRIM',
+  section: 'pedal',
+  type: 'knob',
+  valueType: 'number',
+  surface: 'panel',
+  min: -12,
+  max: 12,
+  step: 5,
+}
+const booleanSwitch: Control = {
+  id: 'pad',
+  label: 'PAD',
+  section: 'pedal',
+  type: 'toggle',
+  valueType: 'boolean',
+  surface: 'panel',
+}
+
 describe('settingValue', () => {
   it('reads an explicit value', () => {
     expect(settingValue({ controlId: 'x', value: 4, confidence: 'provisional' })).toBe(4)
@@ -122,6 +142,22 @@ describe('valuePosition and positionValue', () => {
   it('centres an unknown enum value instead of throwing', () => {
     expect(valuePosition(enumSwitch, 'nonsense')).toBe(0)
   })
+
+  it('places detents from the control\u2019s own minimum, not from zero', () => {
+    // min is not a multiple of step, so a grid measured from 0 would put the
+    // lowest reachable value at -10 and never let the knob reach -12.
+    expect(positionValue(offsetKnob, 0)).toBe(-12)
+    expect(positionValue(offsetKnob, 1)).toBe(12)
+    expect(positionValue(offsetKnob, 5 / 24)).toBe(-7)
+    expect(positionValue(offsetKnob, 10 / 24)).toBe(-2)
+  })
+
+  it('reads a boolean control as off or on rather than mid-travel', () => {
+    expect(valuePosition(booleanSwitch, false)).toBe(0)
+    expect(valuePosition(booleanSwitch, true)).toBe(1)
+    expect(positionValue(booleanSwitch, 0.2)).toBe(false)
+    expect(positionValue(booleanSwitch, 0.8)).toBe(true)
+  })
 })
 
 describe('nudge', () => {
@@ -141,6 +177,19 @@ describe('nudge', () => {
   it('walks enum options', () => {
     expect(nudge(enumSwitch, 'full-fat', 1)).toBe('bright-tight')
     expect(nudge(enumSwitch, 'bright-tight', 1)).toBe('bright-tight')
+  })
+
+  it('steps from the minimum when the minimum is off the step grid', () => {
+    expect(nudge(offsetKnob, -12, 1)).toBe(-7)
+    expect(nudge(offsetKnob, -7, -1)).toBe(-12)
+    expect(nudge(offsetKnob, -12, -1)).toBe(-12)
+  })
+
+  it('toggles a boolean instead of writing a float', () => {
+    expect(nudge(booleanSwitch, false, 1)).toBe(true)
+    expect(nudge(booleanSwitch, true, -1)).toBe(false)
+    expect(nudge(booleanSwitch, true, 1)).toBe(true)
+    expect(nudge(booleanSwitch, false, -1)).toBe(false)
   })
 
   it('starts somewhere sane when there is no value yet', () => {

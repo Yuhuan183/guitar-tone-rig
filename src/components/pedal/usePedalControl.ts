@@ -42,10 +42,16 @@ export function usePedalControl(
       }
       const end = () => {
         start.current = null
-        target.releasePointerCapture(event.pointerId)
         target.removeEventListener('pointermove', move)
         target.removeEventListener('pointerup', end)
         target.removeEventListener('pointercancel', end)
+        try {
+          target.releasePointerCapture(event.pointerId)
+        } catch {
+          // A touch pointer is released with the finger, so it is already gone
+          // by the time pointerup fires and the DOM throws NotFoundError.
+          // Capture is over either way; the listeners above are what matter.
+        }
       }
       target.addEventListener('pointermove', move)
       target.addEventListener('pointerup', end)

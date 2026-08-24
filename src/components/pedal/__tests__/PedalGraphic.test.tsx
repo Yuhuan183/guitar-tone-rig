@@ -26,6 +26,16 @@ const device: Device = {
     },
     { id: 'gain', label: 'Gain', section: 'pedal', type: 'knob', valueType: 'clock', surface: 'panel' },
     {
+      id: 'gr',
+      label: 'GR',
+      section: 'pedal',
+      type: 'readout',
+      valueType: 'number',
+      surface: 'panel',
+      min: 0,
+      max: 20,
+    },
+    {
       id: 'hidden',
       label: 'Editor',
       section: 'pedal',
@@ -40,6 +50,7 @@ const device: Device = {
 const settings: Setting[] = [
   { controlId: 'bypass', value: 'on', confidence: 'provisional' },
   { controlId: 'gain', value: '12:00', confidence: 'provisional' },
+  { controlId: 'gr', value: 8, confidence: 'provisional' },
 ]
 
 describe('PedalGraphic', () => {
@@ -101,6 +112,18 @@ describe('PedalGraphic', () => {
       <PedalGraphic device={device} settings={settings} overrides={{ gain: '15:30' }} onChange={vi.fn()} />,
     )
     expect(screen.getByRole('slider', { name: /Gain：15:30/ })).toBeTruthy()
+  })
+
+  it('names the control and its value in a meter tooltip', () => {
+    const { container } = render(<PedalGraphic device={device} settings={settings} />)
+    const titles = [...container.querySelectorAll('title')].map((node) => node.textContent)
+    expect(titles).toContain('GR\uff1a8')
+  })
+
+  it('says a meter is 未設定 rather than inventing a value', () => {
+    const { container } = render(<PedalGraphic device={device} settings={[]} />)
+    const titles = [...container.querySelectorAll('title')].map((node) => node.textContent)
+    expect(titles).toContain('GR\uff1a未設定')
   })
 
   it('says a control is 未設定 rather than inventing a value', () => {

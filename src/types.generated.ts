@@ -110,10 +110,6 @@ export interface Rig {
    * Hard limits that would damage equipment or the sound if broken. Each names the devices it constrains, so the rule can be shown on their pages from this one copy instead of being retyped into a device warning.
    */
   safetyRules: SafetyRule[]
-  safetyRule?: {
-    rule: string
-    devices: Id[]
-  }
   calibration: Calibration
   /**
    * Symptoms that span more than one device. Anything scoped to a single pedal belongs in that device's troubleshooting in device-guides.json.

@@ -24,6 +24,19 @@ const stubCapture = (el: Element) => {
   Object.assign(el, { setPointerCapture: vi.fn(), releasePointerCapture: vi.fn() })
 }
 
+/**
+ * On touch, the pointer is released with the finger, so it is no longer active
+ * by the time pointerup fires and the DOM throws NotFoundError.
+ */
+const stubThrowingRelease = (el: Element) => {
+  Object.assign(el, {
+    setPointerCapture: vi.fn(),
+    releasePointerCapture: vi.fn(() => {
+      throw new DOMException('no active pointer', 'NotFoundError')
+    }),
+  })
+}
+
 const drag = (el: Element, dy: number) => {
   fireEvent.pointerDown(el, { pointerId: 1, clientY: 200 })
   fireEvent(el, new PointerEvent('pointermove', { clientY: 200 - dy, bubbles: false }))
@@ -74,6 +87,22 @@ describe('pointer drag', () => {
     const callsAfterRelease = onChange.mock.calls.length
     fireEvent(knob, new PointerEvent('pointermove', { clientY: 0 }))
     expect(onChange.mock.calls.length).toBe(callsAfterRelease)
+  })
+
+  it('detaches its listeners even when releasing pointer capture throws', () => {
+    const onChange = vi.fn()
+    render(<PedalGraphic device={device} settings={settings} onChange={onChange} />)
+    const knob = screen.getByRole('slider', { name: /Gain/ })
+    stubThrowingRelease(knob)
+
+    drag(knob, 40)
+    onChange.mockClear()
+
+    // One move in a second drag must reach exactly one handler. A leaked
+    // listener per drag makes every later move fire once per drag so far.
+    fireEvent.pointerDown(knob, { pointerId: 1, clientY: 200 })
+    fireEvent(knob, new PointerEvent('pointermove', { clientY: 160, bubbles: false }))
+    expect(onChange).toHaveBeenCalledTimes(1)
   })
 
   it('does nothing at all when the drawing is read-only', () => {

@@ -219,6 +219,26 @@ for (const type of mappedTypes) {
   if (!typeEnum.includes(type)) errors.push(`panel.ts: PANEL_SHAPES 有 schema 不承認的 type "${type}"`)
 }
 
+// Same argument one level down: value.ts turns a control into a 0–1 position
+// and back, and a valueType it never names falls through to the numeric
+// fallback — drawn at mid-travel, and written back as a float where the schema
+// wants a clock string or a boolean. 'boolean' was in the enum unhandled.
+const valueSource = appSource.get('src/lib/value.ts') ?? ''
+const valueTypeEnum = JSON.parse(read('schemas/devices.schema.json')).$defs.control.properties.valueType.enum
+const positionFunctions = [
+  ...valueSource.matchAll(/export function (valuePosition|positionValue|nudge)\b([\s\S]*?)\n\}/g),
+]
+if (positionFunctions.length !== 3) {
+  errors.push(`value.ts: 找不到三個位置換算函式（比對到 ${positionFunctions.length} 個），檢查已失效`)
+}
+for (const [, name, body] of positionFunctions) {
+  for (const valueType of valueTypeEnum) {
+    if (!body.includes(`valueType === '${valueType}'`)) {
+      errors.push(`value.ts: ${name} 沒有處理 valueType "${valueType}"`)
+    }
+  }
+}
+
 // The enclosure colours are authored in data/devices.json, so the CSS token
 // check above never sees them. A pedal's legend is text on its body and has to
 // be readable at the same threshold as everything else.
