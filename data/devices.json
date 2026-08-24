@@ -1,0 +1,608 @@
+{
+  "$schema": "../schemas/devices.schema.json",
+  "catalogVersion": "4.1.0",
+  "updatedAt": "2026-08-24",
+  "categoryLabels": { "dynamics": "動態", "gain": "增益", "amp-simulator": "音箱前級", "speaker-simulator": "箱體與空間" },
+  "devices": [
+    {
+      "id": "cali76",
+      "manufacturer": "Origin Effects",
+      "model": "Cali76 FET Compressor",
+      "category": "dynamics",
+      "subtype": "fet-compressor",
+      "primaryRole": "Clean 與 Low Gain 的動態、延音及平行壓縮",
+      "placement": "chain",
+      "sections": [
+        { "id": "pedal", "label": "主控制", "description": "面板旋鈕；先用 IN 決定壓縮量，再用 OUT 對齊 Bypass 音量。" },
+        { "id": "meter", "label": "Gain Reduction 目標" }
+      ],
+      "controls": [
+        { "id": "bypass", "label": "Bypass", "section": "pedal", "type": "footswitch", "valueType": "enum", "options": ["off", "on"], "surface": "panel" },
+        {
+          "id": "input",
+          "label": "IN",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較少 Gain Reduction", "right": "較多 Gain Reduction 與輸入推動" }
+        },
+        {
+          "id": "output",
+          "label": "OUT",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較低輸出", "right": "較高輸出" }
+        },
+        {
+          "id": "dry",
+          "label": "DRY",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較少乾訊號", "right": "較多乾訊號；約 14:00 為 Dry Unity" }
+        },
+        {
+          "id": "ratio",
+          "label": "RATIO",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "number",
+          "unit": ":1",
+          "min": 4,
+          "max": 20,
+          "surface": "panel",
+          "direction": { "left": "4:1，較自然", "right": "20:1，限制更強" }
+        },
+        {
+          "id": "attack",
+          "label": "ATTACK",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較慢，保留 Pick Attack", "right": "較快，起音更平" }
+        },
+        {
+          "id": "release",
+          "label": "RELEASE",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較慢恢復", "right": "較快恢復" }
+        },
+        { "id": "gr_peak", "label": "Peak Gain Reduction", "section": "meter", "type": "readout", "valueType": "number", "unit": "dB", "min": 0, "max": 28, "surface": "panel" }
+      ],
+      "appearance": { "widthUnits": 1.6, "heightUnits": 1.55, "body": "#5c5f63", "face": "#e8e4da", "note": "示意圖，非實機外觀；旋鈕角度取自目前音色的設定值。" }
+    },
+    {
+      "id": "notadumble-v2",
+      "manufacturer": "JHS Pedals",
+      "model": "NOTADÜMBLË V2",
+      "category": "gain",
+      "subtype": "dual-preamp-overdrive",
+      "primaryRole": "Clean always-on 基底與 Dumble-style Lead",
+      "placement": "chain",
+      "sections": [
+        { "id": "internal", "label": "內部順序" },
+        { "id": "clean", "label": "Clean Channel", "description": "Always-on 基底；Input 調厚薄，Output 調音量。" },
+        { "id": "drive", "label": "Drive Channel", "description": "Lead Lift；不與 Ive 高 Gain 疊加。" },
+        { "id": "target", "label": "衍生目標" }
+      ],
+      "controls": [
+        { "id": "clean_bypass", "label": "Clean Channel", "section": "clean", "type": "footswitch", "valueType": "enum", "options": ["off", "on"], "surface": "panel" },
+        { "id": "drive_bypass", "label": "Drive Channel", "section": "drive", "type": "footswitch", "valueType": "enum", "options": ["off", "on"], "surface": "panel" },
+        { "id": "internal_order", "label": "Internal Order", "section": "internal", "type": "toggle", "valueType": "enum", "options": ["drive-into-clean", "clean-into-drive"], "surface": "panel" },
+        {
+          "id": "clean_input",
+          "label": "Clean Input",
+          "section": "clean",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較薄、精確", "right": "較圓、飽滿" }
+        },
+        {
+          "id": "clean_output",
+          "label": "Clean Output",
+          "section": "clean",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較低輸出", "right": "較高輸出與後級推動" }
+        },
+        {
+          "id": "drive",
+          "label": "Drive",
+          "section": "drive",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較低失真", "right": "較多失真與壓縮" }
+        },
+        {
+          "id": "drive_volume",
+          "label": "Drive Volume",
+          "section": "drive",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較低 Lead 音量", "right": "較高 Lead 音量及後級推動" }
+        },
+        { "id": "drive_level_lift", "label": "Drive Level Lift", "section": "target", "type": "readout", "valueType": "number", "unit": "dB", "min": 0, "max": 12, "surface": "derived" },
+        {
+          "id": "eq",
+          "label": "EQ",
+          "section": "drive",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "Low-pass 削除更多高頻", "right": "保留更多撥弦輪廓" }
+        },
+        {
+          "id": "presence",
+          "label": "Presence",
+          "section": "drive",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較少上中頻與高頻", "right": "更多存在感" }
+        }
+      ],
+      "appearance": { "widthUnits": 2, "heightUnits": 1.35, "body": "#6b5a3e", "face": "#f0e7d2", "note": "示意圖，非實機外觀；旋鈕角度取自目前音色的設定值。" }
+    },
+    {
+      "id": "petla-ive",
+      "manufacturer": "Petla",
+      "model": "Ive",
+      "category": "gain",
+      "subtype": "mid-focused-overdrive-boost",
+      "primaryRole": "日系 Low Gain 或 IR-D 前的 Tight Boost",
+      "placement": "chain",
+      "sections": [
+        { "id": "pedal", "label": "主控制" }
+      ],
+      "controls": [
+        { "id": "bypass", "label": "Bypass", "section": "pedal", "type": "footswitch", "valueType": "enum", "options": ["off", "on"], "surface": "panel" },
+        {
+          "id": "gain",
+          "label": "Gain",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較少 Ive 失真", "right": "較多失真與壓縮" }
+        },
+        {
+          "id": "volume",
+          "label": "Volume",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較少後級推動", "right": "較多後級推動" }
+        },
+        {
+          "id": "tone",
+          "label": "Tone",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較暗、較柔", "right": "較亮、較清楚" }
+        },
+        {
+          "id": "saturation_cut",
+          "label": "Saturation Cut",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "削中低頻、俐落緊實", "right": "肥、鬆、厚，壓縮與延音增加" }
+        }
+      ],
+      "appearance": { "widthUnits": 1, "heightUnits": 1.6, "body": "#43474d", "face": "#e4e0d6", "note": "示意圖，非實機外觀；旋鈕角度取自目前音色的設定值。" }
+    },
+    {
+      "id": "friedman-ir-d",
+      "manufacturer": "Friedman Amplification",
+      "model": "IR-D",
+      "category": "amp-simulator",
+      "subtype": "dual-tube-preamp-power-amp-simulator",
+      "primaryRole": "主要 Amp 基底與 Rock／Metal 失真來源",
+      "placement": "chain",
+      "sections": [
+        { "id": "global", "label": "通道選擇" },
+        { "id": "ch1", "label": "Channel 1", "description": "Clean、Edge-of-breakup 與接受前級推動的基底。" },
+        { "id": "ch2", "label": "Channel 2", "description": "Hard Rock 到日系 Metal。" },
+        { "id": "power-amp", "label": "Power Amp Simulation" },
+        { "id": "output", "label": "輸出與 Cab IR", "description": "Cab IR 必須 Bypass，Speaker 交給 OX Stomp。" }
+      ],
+      "controls": [
+        { "id": "active_channel", "label": "Active Channel", "section": "global", "type": "footswitch", "valueType": "enum", "options": ["ch1", "ch2"], "surface": "panel" },
+        { "id": "cab_ir", "label": "Cab IR", "section": "output", "type": "toggle", "valueType": "enum", "options": ["bypass", "enabled"], "surface": "software" },
+        { "id": "power_amp_sim", "label": "Power Amp Simulation", "section": "output", "type": "toggle", "valueType": "enum", "options": ["off", "on"], "surface": "software" },
+        { "id": "ch1.gain_structure", "label": "Ch.1 Gain Structure", "section": "ch1", "type": "toggle", "valueType": "enum", "options": ["low-headroom", "medium", "high-gain"], "surface": "panel" },
+        { "id": "ch2.gain_structure", "label": "Ch.2 Gain Structure", "section": "ch2", "type": "toggle", "valueType": "enum", "options": ["low-headroom", "medium", "high-gain"], "surface": "panel" },
+        { "id": "ch1.bright_tight", "label": "Ch.1 Bright/Tight", "section": "ch1", "type": "toggle", "valueType": "enum", "options": ["full-fat", "bright-tight"], "surface": "panel" },
+        { "id": "ch2.bright_tight", "label": "Ch.2 Bright/Tight", "section": "ch2", "type": "toggle", "valueType": "enum", "options": ["full-fat", "bright-tight"], "surface": "panel" },
+        { "id": "ch1.gain", "label": "Ch.1 Gain", "section": "ch1", "type": "knob", "valueType": "clock", "surface": "panel" },
+        { "id": "ch1.bass", "label": "Ch.1 Bass", "section": "ch1", "type": "knob", "valueType": "clock", "surface": "panel" },
+        { "id": "ch1.middle", "label": "Ch.1 Middle", "section": "ch1", "type": "knob", "valueType": "clock", "surface": "panel" },
+        { "id": "ch1.treble", "label": "Ch.1 Treble", "section": "ch1", "type": "knob", "valueType": "clock", "surface": "panel" },
+        { "id": "ch2.gain", "label": "Ch.2 Gain", "section": "ch2", "type": "knob", "valueType": "clock", "surface": "panel" },
+        { "id": "ch2.bass", "label": "Ch.2 Bass", "section": "ch2", "type": "knob", "valueType": "clock", "surface": "panel" },
+        { "id": "ch2.middle", "label": "Ch.2 Middle", "section": "ch2", "type": "knob", "valueType": "clock", "surface": "panel" },
+        { "id": "ch2.treble", "label": "Ch.2 Treble", "section": "ch2", "type": "knob", "valueType": "clock", "surface": "panel" },
+        { "id": "ch1.thump", "label": "Ch.1 Power Amp Thump", "section": "power-amp", "type": "selector", "valueType": "enum", "options": ["low", "medium", "high"], "surface": "software" },
+        { "id": "ch1.presence", "label": "Ch.1 Power Amp Presence", "section": "power-amp", "type": "selector", "valueType": "enum", "options": ["low", "medium", "high"], "surface": "software" },
+        { "id": "ch2.thump", "label": "Ch.2 Power Amp Thump", "section": "power-amp", "type": "selector", "valueType": "enum", "options": ["low", "medium", "high"], "surface": "software" },
+        { "id": "ch2.presence", "label": "Ch.2 Power Amp Presence", "section": "power-amp", "type": "selector", "valueType": "enum", "options": ["low", "medium", "high"], "surface": "software" }
+      ],
+      "appearance": { "widthUnits": 2.4, "heightUnits": 1.15, "body": "#26282b", "face": "#d9cfa8", "note": "示意圖，非實機外觀；旋鈕角度取自目前音色的設定值。" }
+    },
+    {
+      "id": "uafx-ox-stomp",
+      "manufacturer": "Universal Audio",
+      "model": "UAFX OX Stomp",
+      "category": "speaker-simulator",
+      "subtype": "dynamic-cab-mic-room-processor",
+      "primaryRole": "Speaker、Cab、雙 Mic、Room 與 Post-cab FX",
+      "placement": "chain",
+      "sections": [
+        { "id": "pedal", "label": "主控制" },
+        { "id": "rig", "label": "Cabinet" },
+        { "id": "mic1", "label": "Mic 1", "description": "先只開 Mic 1 定義主體。" },
+        { "id": "mic2", "label": "Mic 2", "description": "只補 Mic 1 缺少的厚度或高頻。" },
+        { "id": "master-fx", "label": "Master FX" },
+        { "id": "master-eq", "label": "Master EQ" }
+      ],
+      "controls": [
+        { "id": "bypass", "label": "Bypass", "section": "pedal", "type": "footswitch", "valueType": "enum", "options": ["off", "on"], "surface": "panel" },
+        { "id": "rig_slot", "label": "Rig Slot", "section": "pedal", "type": "rotary-selector", "valueType": "number", "min": 1, "max": 6, "surface": "panel" },
+        {
+          "id": "cab",
+          "label": "Cabinet",
+          "section": "rig",
+          "type": "selector",
+          "valueType": "enum",
+          "options": ["1x12-jbg125", "2x12-two-verb", "2x12-d65", "2x12-alnico-50", "4x12-gb25-punch", "4x12-gb30", "4x12-uk-vee-30"],
+          "surface": "software"
+        },
+        { "id": "mic1_type", "label": "Mic 1 Type", "section": "mic1", "type": "selector", "valueType": "enum", "options": ["57", "67", "121", "421", "414"], "surface": "panel" },
+        { "id": "mic2_type", "label": "Mic 2 Type", "section": "mic2", "type": "selector", "valueType": "enum", "options": ["57", "67", "121", "421", "414"], "surface": "panel" },
+        { "id": "mic1_level", "label": "Mic 1 Level", "section": "mic1", "type": "knob", "valueType": "clock", "surface": "panel" },
+        { "id": "mic2_level", "label": "Mic 2 Level", "section": "mic2", "type": "knob", "valueType": "clock", "surface": "panel" },
+        {
+          "id": "room",
+          "label": "Room",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較乾、較近", "right": "更多房間空氣與距離" }
+        },
+        {
+          "id": "speaker_drive",
+          "label": "Speaker Drive",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "緊、清楚", "right": "更柔、鬆、暗並增加 Speaker Breakup" }
+        },
+        {
+          "id": "output",
+          "label": "Output",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較低輸出", "right": "較高輸出；約 15:00 起校正 Unity" }
+        },
+        { "id": "compressor", "label": "1176 Compressor", "section": "master-fx", "type": "toggle", "valueType": "enum", "options": ["off", "on"], "surface": "software" },
+        { "id": "plate", "label": "Plate Reverb", "section": "master-fx", "type": "selector", "valueType": "enum", "options": ["off", "low", "medium", "high"], "surface": "software" },
+        { "id": "delay", "label": "Stereo Delay", "section": "master-fx", "type": "selector", "valueType": "enum", "options": ["off", "short-low", "medium", "high"], "surface": "software" },
+        { "id": "low_cut", "label": "Low Cut", "section": "master-eq", "type": "knob", "valueType": "number", "unit": "Hz", "min": 20, "max": 500, "surface": "software" },
+        { "id": "high_cut", "label": "High Cut", "section": "master-eq", "type": "knob", "valueType": "number", "unit": "Hz", "min": 2000, "max": 20000, "surface": "software" }
+      ],
+      "appearance": { "widthUnits": 1.8, "heightUnits": 1.3, "body": "#33363a", "face": "#dcd6c8", "note": "示意圖，非實機外觀；旋鈕角度取自目前音色的設定值。" }
+    },
+    {
+      "id": "jan-ray",
+      "manufacturer": "Vemuram",
+      "model": "Jan Ray",
+      "category": "gain",
+      "subtype": "transparent-overdrive",
+      "primaryRole": "Blackface 取向的 Transparent Overdrive／Clean Boost",
+      "placement": "reference",
+      "sections": [
+        { "id": "pedal", "label": "主控制" },
+        { "id": "internal", "label": "內部微調", "description": "背板螺絲下的 Trimmer，接上板之前設定一次，演出中不會再動。" }
+      ],
+      "controls": [
+        { "id": "bypass", "label": "Bypass", "section": "pedal", "type": "footswitch", "valueType": "enum", "options": ["off", "on"], "surface": "panel" },
+        {
+          "id": "volume",
+          "label": "Volume",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較少後級推動", "right": "較多後級推動" }
+        },
+        {
+          "id": "gain",
+          "label": "Gain",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "接近純 Boost，只放大不削波", "right": "在 Trimmer 設定的上限內增加破音與壓縮" }
+        },
+        {
+          "id": "treble",
+          "label": "Treble",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "削高頻，較暗較圓", "right": "不再削，回到原本的高頻" }
+        },
+        {
+          "id": "bass",
+          "label": "Bass",
+          "section": "pedal",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "削低頻，進失真前更緊", "right": "不再削，回到原本的低頻" }
+        },
+        {
+          "id": "saturation",
+          "label": "Saturation Trimmer",
+          "section": "internal",
+          "type": "trimmer",
+          "valueType": "clock",
+          "surface": "internal",
+          "direction": { "left": "更透明、Headroom 較高", "right": "壓縮較多、高頻較收，整體較肥" }
+        }
+      ],
+      "appearance": { "widthUnits": 1, "heightUnits": 1.6, "body": "#6f5c2c", "face": "#f2e4bb", "note": "示意圖，非實機外觀；這顆是參考機種，沒有本鏈的設定值，旋鈕一律畫成未設定。" }
+    },
+    {
+      "id": "aquaria-v2",
+      "manufacturer": "Lichtlaerm Audio",
+      "model": "Aquaria V2",
+      "category": "gain",
+      "subtype": "klon-style-overdrive-with-eq-boost",
+      "primaryRole": "Klon 取向的 Overdrive，外加可獨立踩踏的 4-band EQ 與 Boost",
+      "placement": "reference",
+      "sections": [
+        { "id": "drive", "label": "Overdrive 通道" },
+        { "id": "eq", "label": "EQ 與 Boost 通道", "description": "可獨立踩踏，也能單獨當 EQ 或 Boost 使用。" },
+        { "id": "internal", "label": "內部切換", "description": "外殼內的指撥，決定 Bypass 方式。" }
+      ],
+      "controls": [
+        { "id": "drive_bypass", "label": "Overdrive Bypass", "section": "drive", "type": "footswitch", "valueType": "enum", "options": ["off", "on"], "surface": "panel" },
+        {
+          "id": "gain",
+          "label": "Gain",
+          "section": "drive",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較少削波", "right": "較多削波" }
+        },
+        {
+          "id": "clean_blend",
+          "label": "Clean Blend",
+          "section": "drive",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較少乾訊號，破音比例高", "right": "較多乾訊號，音符核心清楚" }
+        },
+        {
+          "id": "tone",
+          "label": "Tone",
+          "section": "drive",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較暗", "right": "較亮" }
+        },
+        {
+          "id": "dynamics",
+          "label": "Dynamics",
+          "section": "drive",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "鍺二極體：壓縮、平順", "right": "矽二極體：Headroom 高、咬字強" }
+        },
+        {
+          "id": "output",
+          "label": "Output",
+          "section": "drive",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較少後級推動", "right": "較多後級推動" }
+        },
+        { "id": "eq_bypass", "label": "EQ／Boost Bypass", "section": "eq", "type": "footswitch", "valueType": "enum", "options": ["off", "on"], "surface": "panel" },
+        {
+          "id": "eq_bass",
+          "label": "Bass",
+          "section": "eq",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "削 40–100 Hz", "right": "推 40–100 Hz" }
+        },
+        {
+          "id": "eq_low_mid",
+          "label": "Low Mid",
+          "section": "eq",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "削 400 Hz 附近", "right": "推 400 Hz 附近" }
+        },
+        {
+          "id": "eq_high_mid",
+          "label": "High Mid",
+          "section": "eq",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "削 800 Hz 附近", "right": "推 800 Hz 附近" }
+        },
+        {
+          "id": "eq_treble",
+          "label": "Treble",
+          "section": "eq",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "削 4–10 kHz", "right": "推 4–10 kHz" }
+        },
+        {
+          "id": "boost",
+          "label": "Boost",
+          "section": "eq",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "不額外增益", "right": "最多再推一段音量" }
+        },
+        {
+          "id": "bypass_mode",
+          "label": "Bypass Mode",
+          "section": "internal",
+          "type": "toggle",
+          "valueType": "enum",
+          "options": ["buffered", "true-bypass"],
+          "surface": "internal",
+          "description": "Klon 式 Buffered Bypass 或 True Bypass，二選一。"
+        }
+      ],
+      "appearance": { "widthUnits": 1.9, "heightUnits": 1.45, "body": "#1f4a52", "face": "#d8ece9", "note": "示意圖，非實機外觀；這顆是參考機種，沒有本鏈的設定值，旋鈕一律畫成未設定。" }
+    },
+    {
+      "id": "empress-drive",
+      "manufacturer": "Empress Effects",
+      "model": "Drive",
+      "category": "gain",
+      "subtype": "active-eq-overdrive-with-gate",
+      "primaryRole": "削波前可掃中頻的 Overdrive，內建 30 dB 可指定 Boost 與自適應 Gate",
+      "placement": "reference",
+      "sections": [
+        { "id": "drive", "label": "破音" },
+        { "id": "eq", "label": "EQ", "description": "Midrange 在削波前，Bass 與 Treble 在 Mix 之後。" },
+        { "id": "dynamics", "label": "Boost 與 Gate" },
+        { "id": "config", "label": "進階設定", "description": "長按組合鍵切換，不是面板上的實體開關。" }
+      ],
+      "controls": [
+        { "id": "bypass", "label": "Bypass", "section": "drive", "type": "footswitch", "valueType": "enum", "options": ["off", "on"], "surface": "panel" },
+        {
+          "id": "gain",
+          "label": "Gain",
+          "section": "drive",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "接近 Clean，只有邊緣破裂", "right": "厚實飽和" }
+        },
+        {
+          "id": "mix",
+          "label": "Mix",
+          "section": "drive",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "幾乎全乾訊號，透明度高", "right": "全濕訊號，壓縮與失真最完整" }
+        },
+        {
+          "id": "output",
+          "label": "Output",
+          "section": "drive",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "較少後級推動", "right": "較多後級推動" }
+        },
+        {
+          "id": "bass",
+          "label": "Bass",
+          "section": "eq",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "削低頻（最多 −15 dB @200 Hz）", "right": "推低頻（最多 +15 dB @200 Hz）" }
+        },
+        {
+          "id": "midrange",
+          "label": "Midrange",
+          "section": "eq",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "削中頻，進削波前更稀疏、更緊", "right": "推中頻，進削波前更密、更有咬字" }
+        },
+        {
+          "id": "mid_freq",
+          "label": "Mid Freq",
+          "section": "eq",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "200 Hz，低中頻厚實的破裂", "right": "2.5 kHz，上中頻的切穿與清晰度" }
+        },
+        {
+          "id": "treble",
+          "label": "Treble",
+          "section": "eq",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "削高頻（最多 −15 dB @2 kHz）", "right": "推高頻（最多 +15 dB @2 kHz）" }
+        },
+        { "id": "boost_switch", "label": "Boost 踏板", "section": "dynamics", "type": "footswitch", "valueType": "enum", "options": ["off", "on"], "surface": "panel" },
+        {
+          "id": "boost",
+          "label": "Boost",
+          "section": "dynamics",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "不額外增益", "right": "最多 +30 dB" }
+        },
+        {
+          "id": "gate",
+          "label": "Gate",
+          "section": "dynamics",
+          "type": "knob",
+          "valueType": "clock",
+          "surface": "panel",
+          "direction": { "left": "關閉，完全不作用", "right": "最積極，休止時最快關閉" }
+        },
+        {
+          "id": "boost_position",
+          "label": "Boost 位置",
+          "section": "config",
+          "type": "toggle",
+          "valueType": "enum",
+          "options": ["pre-overdrive", "post-overdrive"],
+          "surface": "internal",
+          "description": "削波前＝把削波推更兇並濾掉低頻堆積；削波後＝只抬總音量，不改失真性格。長按 Boost＋Bypass 切換。"
+        }
+      ],
+      "appearance": { "widthUnits": 1, "heightUnits": 1.85, "body": "#2b2f36", "face": "#e6e2d6", "note": "示意圖，非實機外觀；這顆是參考機種，沒有本鏈的設定值，旋鈕一律畫成未設定。" }
+    }
+  ]
+}

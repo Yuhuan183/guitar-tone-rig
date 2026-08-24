@@ -1,0 +1,559 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.guitar-rig/schemas/rig.schema.json",
+  "title": "Guitar rig and tone presets",
+  "type": "object",
+  "required": [
+    "rigId",
+    "rigVersion",
+    "status",
+    "updatedAt",
+    "deviceCatalog",
+    "signalChain",
+    "routing",
+    "safetyRules",
+    "baseline",
+    "presets",
+    "calibration",
+    "diagnostics"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "rigId": {
+      "$ref": "#/$defs/id"
+    },
+    "rigVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "status": {
+      "enum": [
+        "draft-unverified",
+        "in-calibration",
+        "verified"
+      ]
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date"
+    },
+    "statusNote": {
+      "type": "string"
+    },
+    "deviceCatalog": {
+      "type": "string"
+    },
+    "signalChain": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "#/$defs/chainNode"
+      }
+    },
+    "routing": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/route"
+      }
+    },
+    "safetyRules": {
+      "description": "Hard limits that would damage equipment or the sound if broken. Each names the devices it constrains, so the rule can be shown on their pages from this one copy instead of being retyped into a device warning.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/safetyRule"
+      }
+    },
+    "safetyRule": {
+      "type": "object",
+      "required": [
+        "rule",
+        "devices"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "devices": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "calibration": {
+      "$ref": "#/$defs/calibration"
+    },
+    "diagnostics": {
+      "description": "Symptoms that span more than one device. Anything scoped to a single pedal belongs in that device's troubleshooting in device-guides.json.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/diagnostic"
+      }
+    },
+    "openSlots": {
+      "description": "A job this chain does not currently have a device for, with the shortlist. Distinct from a reference device: there is no pedal here to model, only a decision that has not been made.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/openSlot"
+      }
+    },
+    "baseline": {
+      "$ref": "#/$defs/baseline"
+    },
+    "presets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/preset"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "clock": {
+      "type": "string",
+      "pattern": "^(0[7-9]|1[0-7]):(?:00|30)$"
+    },
+    "scalar": {
+      "type": [
+        "string",
+        "number",
+        "boolean"
+      ]
+    },
+    "range": {
+      "type": "object",
+      "required": [
+        "min",
+        "max"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "min": {
+          "$ref": "#/$defs/scalar"
+        },
+        "max": {
+          "$ref": "#/$defs/scalar"
+        }
+      }
+    },
+    "choices": {
+      "type": "object",
+      "required": [
+        "preferred",
+        "alternatives"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "preferred": {
+          "$ref": "#/$defs/scalar"
+        },
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/scalar"
+          }
+        }
+      }
+    },
+    "setting": {
+      "type": "object",
+      "required": [
+        "controlId",
+        "confidence"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "controlId": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+(?:\\.[a-z0-9_]+)*$"
+        },
+        "value": {
+          "$ref": "#/$defs/scalar"
+        },
+        "range": {
+          "$ref": "#/$defs/range"
+        },
+        "choices": {
+          "$ref": "#/$defs/choices"
+        },
+        "target": {
+          "type": "string"
+        },
+        "confidence": {
+          "description": "How much this particular value has been earned. Named apart from rig.status and preset.status on purpose: those three are different scales and sharing a field name invited reading the wrong one.",
+          "enum": [
+            "provisional",
+            "needs-calibration",
+            "verified"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "value"
+          ]
+        },
+        {
+          "required": [
+            "range"
+          ]
+        },
+        {
+          "required": [
+            "choices"
+          ]
+        },
+        {
+          "required": [
+            "target"
+          ]
+        }
+      ]
+    },
+    "settingsMap": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/setting"
+        }
+      }
+    },
+    "chainNode": {
+      "type": "object",
+      "required": [
+        "order",
+        "kind"
+      ],
+      "properties": {
+        "order": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "kind": {
+          "enum": [
+            "device",
+            "endpoint"
+          ]
+        },
+        "deviceId": {
+          "$ref": "#/$defs/id"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "device"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "deviceId"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "endpoint"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "id",
+              "label"
+            ]
+          }
+        }
+      ]
+    },
+    "route": {
+      "type": "object",
+      "required": [
+        "from",
+        "to",
+        "signal"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "signal": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "safetyRule": {
+      "type": "object",
+      "required": [
+        "rule",
+        "devices"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "devices": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "calibration": {
+      "description": "The order in which this chain is dialled in from nothing. Rig-level because no single device owns it.",
+      "type": "object",
+      "required": [
+        "title",
+        "steps"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "required": [
+        "symptom",
+        "check",
+        "devices"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "symptom": {
+          "type": "string",
+          "minLength": 1
+        },
+        "check": {
+          "type": "string",
+          "minLength": 1
+        },
+        "devices": {
+          "description": "The devices involved, by id, so a diagnosis cannot outlive the pedals it names.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "openSlot": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "problem",
+        "candidates"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "problem": {
+          "description": "Why the slot is still open — the thing that makes the obvious answer wrong.",
+          "type": "string",
+          "minLength": 1
+        },
+        "topology": {
+          "description": "The routing this slot would need, in signal order.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "rules": {
+          "description": "How to set whatever ends up here, independent of which candidate wins.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "candidates": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "verdict",
+              "url",
+              "notes"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "verdict": {
+                "description": "The one-line reason this candidate is on the list at all.",
+                "type": "string",
+                "minLength": 1
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "notes": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "required": [
+        "id",
+        "description",
+        "settings"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "description": {
+          "type": "string"
+        },
+        "settings": {
+          "$ref": "#/$defs/settingsMap"
+        }
+      }
+    },
+    "preset": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "rigSlot",
+        "inherits",
+        "status",
+        "target",
+        "genres",
+        "pickupPreference",
+        "settings",
+        "tier"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string"
+        },
+        "rigSlot": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6
+        },
+        "inherits": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "enum": [
+            "untested",
+            "testing",
+            "verified",
+            "rejected"
+          ]
+        },
+        "target": {
+          "type": "string"
+        },
+        "genres": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "pickupPreference": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "settings": {
+          "$ref": "#/$defs/settingsMap"
+        },
+        "tier": {
+          "description": "primary = a voice this chain was built for; secondary = a position derived between the primary voices.",
+          "enum": [
+            "primary",
+            "secondary"
+          ]
+        }
+      }
+    }
+  }
+}

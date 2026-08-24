@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.guitar-rig/schemas/tuning-log.schema.json",
+  "title": "Guitar rig tuning log",
+  "type": "object",
+  "required": ["rigId", "sessions"],
+  "additionalProperties": false,
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "controlId": { "type": "string", "pattern": "^[a-z0-9_]+(?:\\.[a-z0-9_]+)*$" },
+    "scalar": { "type": ["string", "number", "boolean"] }
+  },
+  "properties": {
+    "$schema": { "type": "string" },
+    "rigId": { "$ref": "#/$defs/id" },
+    "instructions": { "type": "string" },
+    "sessions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "date", "presetId", "context", "observations", "changes", "decision"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "date": { "type": "string", "format": "date" },
+          "presetId": { "$ref": "#/$defs/id" },
+          "context": {
+            "type": "object",
+            "required": ["guitar", "pickup", "monitoring", "volume"],
+            "additionalProperties": false,
+            "properties": {
+              "guitar": { "type": "string" },
+              "pickup": { "type": "string" },
+              "monitoring": { "type": "string" },
+              "volume": { "type": "string" },
+              "room": { "type": "string" }
+            }
+          },
+          "observations": { "type": "array", "items": { "type": "string" } },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["deviceId", "controlId", "before", "after", "reason"],
+              "additionalProperties": false,
+              "properties": {
+                "deviceId": { "$ref": "#/$defs/id" },
+                "controlId": { "$ref": "#/$defs/controlId" },
+                "before": { "$ref": "#/$defs/scalar" },
+                "after": { "$ref": "#/$defs/scalar" },
+                "reason": { "type": "string" }
+              }
+            }
+          },
+          "decision": { "enum": ["keep", "revise", "reject", "inconclusive"] },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}

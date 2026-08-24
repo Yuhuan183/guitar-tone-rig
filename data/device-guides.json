@@ -1,0 +1,353 @@
+{
+  "$schema": "../schemas/device-guides.schema.json",
+  "guidesVersion": "3.1.0",
+  "updatedAt": "2026-08-24",
+  "guides": {
+    "cali76": {
+      "eyebrow": "Dynamics · First in chain",
+      "summary": "讓 Clean／Low Gain 的小音符、滑音與延音更完整；不是追求明顯的壓縮特效。高增益 Rhythm 通常關閉。",
+      "principles": [
+        { "title": "3–5 dB 是峰值", "body": "一般彈奏約亮 1、3 dB，最重撥弦瞬間碰到 5 dB；不要讓三顆燈持續全亮。" },
+        { "title": "保留 Pick Attack", "body": "Attack 不要太快；Cali76 的 Attack 與 Release 都是往右變快。Ratio 4:1 約在 10:30–11:00。" },
+        { "title": "平行壓縮", "body": "DRY 約 12:30–2:00，先用 OUT 對齊 bypass 音量，再用 DRY 找回未壓縮的瞬態。" }
+      ],
+      "troubleshooting": [
+        { "symptom": "Clean 太平", "action": "降低 IN 或放慢 Attack，確認峰值沒有長時間超過 5 dB。" },
+        { "symptom": "底噪上升", "action": "降低 IN；Rock／Metal 先關閉 Cali76，再判斷其他 Gain Stage。" }
+      ],
+      "controlNotes": {
+        "input": "推高訊號超過固定 Threshold 的程度；太多會同時增加壓縮、單線圈 Hum，並讓後級更早失真。",
+        "output": "壓縮訊號的輸出音量；用來對齊 Bypass，避免把單純變大聲誤判成音色更好。",
+        "dry": "平行混回未壓縮訊號，約 2 點為 Dry Unity；右轉也會增加總音量，需同步校正 OUT。",
+        "ratio": "4:1 到 20:1；目前以全左 4:1 為主，高 Ratio 會更強硬地箝制峰值。",
+        "attack": "決定多快開始壓縮；偏慢保留起音，過快會削弱 Pick Attack。",
+        "release": "決定多久停止壓縮；中快可在音符間恢復，過慢會讓連續音符持續被壓住。"
+      },
+      "facts": ["Cali76 使用 Buffer Output，因此後面的 NOTADÜMBLË Clean Input 阻抗變化可能比吉他直入時更細微。"],
+      "chainRole": [
+        { "job": "把 Clean／Low Gain 的小音符、滑音與延音撐起來。", "avoid": "不要當成明顯的壓縮特效；Gain Reduction 長時間超過 5 dB 就是過頭。" }
+      ],
+      "sources": [
+        { "label": "Origin Effects 官方產品頁", "url": "https://origineffects.com/product/cali76-fet-compressor/" }
+      ],
+      "caveats": ["鐘點位置會受拾音器輸出與 Buffer 影響；IN 一律以 Gain Reduction 表讀數為準，不是旋鈕角度。"]
+    },
+    "notadumble-v2": {
+      "eyebrow": "Always-on preamp · Dumble-style lead",
+      "summary": "Clean 端是 Box It Later／Dumble A Box Later 類 Buffer Preamp Boost；Drive 端負責平滑、歌唱性的 Lead。",
+      "principles": [
+        { "title": "Drive → Clean", "body": "優先使用的內部順序。Drive 是 Lead Lift，Clean 保持 always-on；Clean → Drive 會增加推動與壓縮。" },
+        { "title": "Input 決定手感", "body": "Clean Input 改變訊號看到的阻抗：左側較薄、精確，右側較圓、飽滿；Output 才負責音量校正。" },
+        { "title": "Drive 的角色", "body": "以中等 Drive、較收斂的 EQ 與 Presence 建立 violin-like lead，不與 Ive 高 Gain 同時工作。" }
+      ],
+      "troubleshooting": [
+        { "symptom": "Ch.2 過肥", "action": "先降低 Clean Input 或 Output，不要立刻大削 IR-D Bass。" },
+        { "symptom": "Lead 太滑、輪廓不足", "action": "降低 Drive，略加 Presence，或讓 Cali76 bypass。" }
+      ],
+      "controlNotes": {
+        "clean_input": "不是一般 Gain，而是改變訊號看到的阻抗；Cali76 Buffer 在前時，差異可能較細微。",
+        "clean_output": "Clean Channel／Loop Send 的主輸出音量；用來校正開關前後音量，不拿 Input 補音量。",
+        "eq": "Low-pass Filter：往左削更多高頻，往右保留更多撥弦輪廓。",
+        "presence": "調整 Gain Stage 的上中頻與高頻；太悶時先小幅增加 Presence，再決定是否把 EQ 往右。"
+      },
+      "facts": ["TRS Loop 可把外部效果插入 Clean Circuit；目前不使用，維持外部串接較容易理解與除錯。", "只使用 9V center-negative 供電。"],
+      "chainRole": [
+        { "scope": "Clean", "job": "Always-on Buffer／Preamp，建立厚度與手感。", "avoid": "不要用過大 Output 把所有後級推進失真。" },
+        { "scope": "Drive", "job": "平滑、歌唱性的 Dumble-style Lead。", "avoid": "不要與 Ive 高 Gain、IR-D Ch.2 全開堆疊。" }
+      ],
+      "sources": [
+        { "label": "JHS 官方產品頁", "url": "https://jhspedals.info/products/notadumble-v2" }
+      ]
+    },
+    "petla-ive": {
+      "eyebrow": "Modern TS family · Tight boost",
+      "summary": "可作 Boost、Crunch 與主破音的中頻導向 Overdrive。現在放在 NOTADÜMBLË 後、IR-D 前，兼具 Post-shaping 與 Pre-EQ。",
+      "principles": [
+        { "title": "Saturation Cut 左側", "body": "削掉中低頻，聲音清脆、快速、俐落；適合日系 Low Gain 與 IR-D Ch.2 Tight Boost。" },
+        { "title": "Saturation Cut 右側", "body": "聲音更肥、鬆、厚，壓縮與延音較多；適合厚實 Crunch，但與 NOTADÜMBLË Drive 重疊。" },
+        { "title": "Metal 只做整理", "body": "維持低 Gain、高 Volume，讓 IR-D 產生主要失真；Ive 只收束低頻與強化 Pick Attack。" }
+      ],
+      "troubleshooting": [
+        { "symptom": "Palm Mute 肥鬆", "action": "Saturation Cut 往左，或降低 IR-D Bass。" },
+        { "symptom": "過薄、沒有重量", "action": "Saturation Cut 小幅右移到 8:30–9:00，保留 IR-D Middle。" },
+        { "symptom": "只變吵、沒有更清楚", "action": "降低 Ive Volume 或 IR-D Gain；不要增加 Ive Gain。" },
+        { "symptom": "刺耳", "action": "Tone 往左，並檢查 IR-D Bright／Tight 是否太強。" },
+        { "symptom": "壓縮太重", "action": "降低 Ive Gain，確認 Cali76 在 Metal Rhythm 已關閉。" },
+        { "symptom": "噪音升高", "action": "不要把 Volume 推過實際需要；Gate 應包住整條 Gain Chain。" }
+      ],
+      "warning": "只使用 9V center-negative；Petla 官方警告 18V 可能造成損壞。",
+      "chainRole": [
+        { "job": "Low Gain Crunch 或 Tight Boost。", "avoid": "Metal 不靠它產生主要失真。" }
+      ],
+      "sources": [
+        { "label": "Petla Ive 產品頁", "url": "https://nns.base.shop/items/74818024" }
+      ],
+      "caveats": ["Saturation Cut 左側削中低頻、右側肥鬆厚，是這顆實機的使用觀察，不是原廠規格。"]
+    },
+    "friedman-ir-d": {
+      "eyebrow": "Dual tube preamp · Power amp simulation",
+      "summary": "兩個 Channel 都是 Dirty Shirley／Twin Sister 衍生前級。IR-D 負責真空管前級、Gain Structure 與 Power Amp Simulation，Cab IR 關閉。",
+      "principles": [
+        { "title": "Channel 1", "body": "GAIN 撥桿中間：最低 Gain、最高 Headroom，作為 Clean、Edge-of-breakup 與接受前級推動的基底。" },
+        { "title": "Channel 2", "body": "GAIN 撥桿上方：最高 Gain，以較低 Gain 旋鈕搭配 Ive Tight Boost，涵蓋 Hard Rock 到日系 Metal。" },
+        { "title": "Power Amp 保留", "body": "Presence／Thump 與 Cab IR 是不同功能；關閉 Cab IR，但保留 Power Amp Simulation 後送入 OX Stomp。" }
+      ],
+      "troubleshooting": [
+        { "symptom": "OX 輸入硬削波", "action": "先降低 IR-D Volume／Boost Volume，不要用 OX High Cut 掩蓋。" },
+        { "symptom": "Metal 糊", "action": "降低 Gain 與 Bass，Bright/Tight 設 Tight，再讓 Ive 做小幅低頻整理。" }
+      ],
+      "controlNotes": { "ch1.gain_structure": "中間是最低 Gain／最高 Headroom；下方是中等 Gain、較開放的 Crunch；上方是最高 Gain。", "ch2.gain_structure": "三段不是在 Twin Sister 與 Dirty Shirley 間切換；明確的緊實與高中心頻提升主要由 Bright／Tight 控制。" },
+      "workflow": {
+        "title": "接到 OX Stomp",
+        "steps": [
+          "長按 Channel 1 Footswitch 切換 IR Output Bypass，確認內建 Cab IR 關閉。",
+          "保留 Editor 中每個 Channel 的 Power Amp Presence／Thump。",
+          "BALANCED OUT 接 OX INPUT 1，從低輸出開始，避免 OX 輸入過載。",
+          "OX 後接全頻介面、PA、FRFR 或錄音系統，不接傳統音箱 Speaker Input。"
+        ]
+      },
+      "facts": ["Ch.1 目標是輕彈乾淨、正常彈有毛邊、重彈輕微 Breakup；Ch.2 保留中頻，維持日系 Metal 的旋律與雙吉他存在感。"],
+      "warning": "BALANCED OUT → OX INPUT 1，並確認 IR Output 已 Bypass。",
+      "chainRole": [
+        { "job": "主要 Amp Distortion 與 Channel 音色。", "avoid": "已有 Ive 推動時，Gain 不追求最大。" }
+      ],
+      "sources": [
+        { "label": "Friedman IR-D 官方產品頁", "url": "https://friedmanamplification.com/shop/pedals/friedman-ir-d/" },
+        { "label": "IR-D 官方手冊 PDF", "url": "https://friedmanamplification.com/wp-content/uploads/2024/03/Friedman_IR-D_Manual-Final-Reduced-Size.pdf" }
+      ],
+      "caveats": ["Cab IR Bypass 與 Power Amp Simulation 是獨立功能；目前保留 Presence／Thump，Speaker 交給 OX Stomp。"]
+    },
+    "uafx-ox-stomp": {
+      "eyebrow": "Dynamic speaker · Cab · Mic · Room",
+      "summary": "最後的 Speaker 系統：Dynamic Speaker Modeling、雙 Close Mic、Room 與 Post-cab Studio FX，完整取代 IR-D Cab IR。",
+      "principles": [
+        { "title": "先完成 Cab／Mic", "body": "先只開 Mic 1，Room 與 Speaker Drive 歸低；Mic 2 只補不足的厚度或高頻。" },
+        { "title": "Room 與 Reverb 分工", "body": "Room 是錄音空間與麥克風距離；Plate 才是額外效果。Metal 只加入少量 Room。" },
+        { "title": "Post-cab EQ", "body": "4-band EQ 與 Low／High Cut 用於最後修整；先選對 Cab／Mic，再做小幅 EQ。" }
+      ],
+      "troubleshooting": [
+        { "symptom": "聲音鬆、暗", "action": "降低 Speaker Drive；Metal 建議約 8:30–9:30。" },
+        { "symptom": "像套兩層箱體", "action": "確認 IR-D Cab IR 已 Bypass。" },
+        { "symptom": "立體聲空間消失", "action": "OX Output 1、2 都要接到介面或 PA。" }
+      ],
+      "controlNotes": {
+        "room": "Close Mic 以外的錄音室空氣與距離；Metal 約 8:30–9:30，Clean／Lead 約 10:00–12:00。",
+        "speaker_drive": "右轉會逐漸柔軟、鬆、暗並增加 Breakup；Metal 維持低檔，避免把它當一般 Gain。",
+        "output": "原廠指出通常約 3 點至最大才接近輸入音量；由 3 點開始校正。",
+        "mic1_level": "先只開 Mic 1 定義主體，再混入 Mic 2 補厚度或高頻。",
+        "mic2_level": "不要預設兩支 Mic 都全開；第二支只補主 Mic 缺少的部分。"
+      },
+      "workflow": {
+        "title": "OX 校正順序",
+        "steps": [
+          "確認 IR-D Cab IR Bypass，OX Master Effects 暫時全關。",
+          "只開 Mic 1，Room 與 Speaker Drive 歸低，先選 Cab。",
+          "選 Mic 1 並調位置／軸向，完成主要音色。",
+          "慢慢加入 Mic 2，只補不足的厚度或高頻。",
+          "加入少量 Room；Metal 只要不完全乾燥即可。",
+          "由 Output 約 3 點開始校正 Unity，再開 Master EQ 與時間效果。"
+        ]
+      },
+      "facts": [
+        "所有 1/4 吋音訊端子都是 Unbalanced TS；可插 TRS，但沒有額外平衡傳輸優勢。",
+        "Mic 方向：57 強調咬字、421 厚而平順、121 補身體、67／414 提供開闊細節。",
+        "Clean／Dumble 優先 JBG125、D65、Alnico 50；Rock／Metal 優先 GB25 Punch、GB30、UK Vee 30。",
+        "1176 Compressor 預設關閉；4-band EQ 與 Low／High Cut 是 Post-cab 修整，Plate／Delay 屬錄音室後製空間。",
+        "需要隔離 9V DC 供電，至少 400 mA。"
+      ],
+      "chainRole": [
+        { "job": "Speaker／Mic／Room 與 Post FX。", "avoid": "不要重疊 Cab IR 或把 Speaker Drive 當一般 Gain。" }
+      ],
+      "sources": [
+        { "label": "Universal Audio OX Stomp 官方頁", "url": "https://www.uaudio.com/products/ox-stomp-dynamic-speaker-emulator" },
+        { "label": "OX Stomp 官方手冊", "url": "https://help.uaudio.com/hc/en-us/articles/13621362465300-UAFX-OX-Stomp-Dynamic-Speaker-Emulator-Manual" }
+      ],
+      "caveats": ["Rig 編號可由 UAFX Control 重新指派，因此這裡以 Cab／Mic 名稱為準，不假設固定編號。"]
+    },
+    "jan-ray": {
+      "eyebrow": "Reference · Transparent overdrive",
+      "summary": "Timmy 系的 Transparent Overdrive，目標是 Blackface Fender 剛要破的那一點。放在知識庫裡是當比較基準用的，不在目前這條鏈上。",
+      "principles": [
+        { "title": "Transparent 的意思是不重塑中頻", "body": "TS 系會拱中頻、削低頻，所以插上去就換了一種音色；Jan Ray 走的是把原本的音色推大，加一點壓縮與延音。它比較接近「另一種 Clean Boost」，而不是另一顆破音。" },
+        { "title": "Bass 與 Treble 是切除型，不是增益型", "body": "Timmy 拓樸的兩個 EQ 只會削：轉到底是不再削，不是額外加。用一般 Boost／Cut 的直覺去轉，會覺得「怎麼只會變暗」。要更亮得往後級或 Cab／Mic 找。" },
+        { "title": "Saturation Trimmer 是一次性設定，不是第五顆旋鈕", "body": "Vemuram 每顆踏板都有內部 Trimmer，用意是先把 Gain 範圍設到自己的拾音器與音箱通道，之後面板 Gain 只在這個範圍裡動。裝上板之前決定，之後就不再碰。" }
+      ],
+      "troubleshooting": [
+        { "symptom": "開起來只是變大聲，聽不出破音", "action": "這就是設計本身。要更多破音先調 Saturation Trimmer 或用它去推後級，不是把面板 Gain 轉滿。" },
+        { "symptom": "Treble 轉滿還是不夠亮", "action": "Cut 型 EQ 到底就是停止削減，不會額外加亮。亮度要在 IR-D 的 Presence 或 OX Stomp 的 Mic／EQ 上處理。" },
+        { "symptom": "和 NOTADÜMBLË Clean 一起開就糊掉", "action": "兩者都是 Always-on 取向的厚度來源，低頻會疊起來。擇一，不要串著開。" }
+      ],
+      "controlNotes": {
+        "volume": "單位增益點大約在中間偏上；當 Clean Boost 用時，先找到「開關切換音量不變」的位置，再從那裡往上推。",
+        "gain": "有效範圍被內部 Trimmer 限住，所以同一個鐘點在兩顆設定不同的 Jan Ray 上不會是同一個聲音。",
+        "treble": "切除型：往右不是加高頻，是停止削高頻。",
+        "bass": "切除型：進 IR-D 這種高增益前級之前，往左削掉一些低頻通常比較緊。",
+        "saturation": "不在面板上，要拆背板螺絲。設定完就當作出廠值看待，不列入演出中的可調參數。"
+      },
+      "facts": ["黃銅外殼，約 70 × 112 × 50 mm、428 g；同尺寸鋁殼踏板的兩倍以上重量。", "9V center-negative，耗電約 5 mA；原廠不建議 18V 運作。", "面板四顆旋鈕在實機上沒有印字。"],
+      "comparisons": [
+        {
+          "deviceId": "petla-ive",
+          "shared": "都是放在 IR-D 前、負責 Low Gain 或 Boost 的那一級。",
+          "differs": "Ive 是中頻導向，而且有 Saturation Cut 能主動削掉低中頻換緊實；Jan Ray 不重塑中頻，只有兩個切除型 EQ，靠推大與壓縮做事。",
+          "chooseWhen": "要 Tight、要 Metal 前的 Pre-EQ 就用 Ive；要保留吉他原本的音色、只多一點延音才輪到 Jan Ray。"
+        },
+        {
+          "deviceId": "notadumble-v2",
+          "shared": "都能當 Always-on 的厚度與手感來源。",
+          "differs": "NOTADÜMBLË Clean 是 Buffer Preamp Boost，而且和 Drive 端共用同一顆踏板、共用一次踩踏；Jan Ray 只做一件事，但 EQ 是切除型，調整方向和它相反。",
+          "chooseWhen": "想用單一顆解決 Always-on、面板越單純越好時選 Jan Ray；已經有 NOTADÜMBLË 就沒有再加的理由。"
+        }
+      ],
+      "evaluation": {
+        "placements": [
+          { "role": "Transparent always-on boost", "chain": "Cali76 → Jan Ray → NOTADÜMBLË V2 → Ive → IR-D", "verdict": "可行，但和 NOTADÜMBLË Clean 的工作完全重疊，同時開會過肥。" }
+        ],
+        "overlaps": ["notadumble-v2", "petla-ive"],
+        "verdict": "hold",
+        "rationale": "這條鏈的 Always-on 厚度已經由 NOTADÜMBLË Clean 負責，Tight Boost 由 Ive 負責。Jan Ray 兩邊都碰得到，但兩邊都不是唯一解。它會贏的情境是「只想要一顆做 Transparent Boost、面板最單純」，而目前沒有這個需求。",
+        "tradeoffs": ["多一級 Gain 就多一段 Hiss，Gate 的偵測位置要跟著重新決定。", "切除型 EQ 與現有三顆的 Boost／Cut 直覺相反，臨場調整容易轉錯方向。", "主要的可調範圍藏在背板 Trimmer 裡，換吉他或換通道時不能即時對應。"]
+      },
+      "sources": [
+        { "label": "Vemuram Jan Ray 官方產品頁", "url": "https://vemuram.com/product.html?No=8" },
+        { "label": "Vemuram 官方：黃銅外殼與內部 Trimmer 的設計理由", "url": "https://vemuram.com/about-us.html" }
+      ],
+      "caveats": [
+        "這顆不在手上，也沒進過這條鏈。以下每一條都是規格與公開資料的推論，不是實機聽感。",
+        "官方產品頁目前標示 Discontinued，規格表欄位是空的；尺寸、重量與耗電取自經銷商轉載的原廠文案，未經官方頁面確認。",
+        "Bass／Treble 為切除型是從 Timmy 拓樸推得，Vemuram 沒有公開電路；實機到手要先確認轉向。",
+        "四顆旋鈕在實機上沒有印字，各家經銷商列出的對應順序不一致，面板圖的排列只是本專案的假設。"
+      ]
+    },
+    "aquaria-v2": {
+      "eyebrow": "Reference · Klon-style overdrive + EQ",
+      "summary": "Klon 衍生的 Overdrive，另外掛一組可獨立踩踏的 4-band EQ 與 Boost。放在知識庫裡是因為它的工作和 NOTADÜMBLË／Ive 重疊，不是因為它不好。",
+      "principles": [
+        { "title": "Klon 的核心是混音，不是削波", "body": "Klon 拓樸把乾訊號和削波後的訊號並聯混合，所以「透明」來自那條乾訊號。Aquaria 把它拆成獨立的 Clean Blend，等於把 Klon 最關鍵的比例交到手上。" },
+        { "title": "Dynamics 是換二極體，不是換 Tone", "body": "從鍺的壓縮平順推到矽的高 Headroom 咬字。它改的是削波性格與動態，不是頻率響應；覺得不夠亮要動 Tone 或 EQ，不是動它。" },
+        { "title": "兩個踏板等於兩顆效果器", "body": "EQ／Boost 可以完全不碰 Overdrive 單獨使用。真正要評估的不是「要不要一顆 Klon」，而是「要不要一顆 Klon 加一組可踩的 EQ」。" }
+      ],
+      "troubleshooting": [
+        { "symptom": "轉大 Gain 但聽起來只是變髒，沒有更大聲", "action": "Klon 拓樸的 Gain 同時改變乾濕比例；音量要用 Output，Gain 只決定破音量。" },
+        { "symptom": "進 IR-D Ch.2 之後低頻糊掉", "action": "用 EQ 的 Bass 往左削，或降 Clean Blend；不要靠 IR-D 的 Bass 去補救已經進去的低頻。" },
+        { "symptom": "EQ 單獨踩下去音量就跳", "action": "Boost 是這一側的 Master Volume，要單純當 EQ 用就把它校到單位增益。" }
+      ],
+      "controlNotes": {
+        "clean_blend": "這是 Klon「透明」的來源；往左等於變成一顆普通破音。",
+        "dynamics": "鍺端接近原始 Centaur，矽端比較接近現代 Low Gain。",
+        "boost": "屬於 EQ 側而不是 Overdrive 側，兩個踏板的音量要分別校。",
+        "bypass_mode": "在外殼內，裝上板之前決定；Buffered 有 Klon 特有的 Buffer 音色，True Bypass 沒有。"
+      },
+      "facts": ["內部升壓到約 27V 運作，Headroom 高於一般 9V 破音。", "EQ 為 constant-Q、非互動式，每段最多 ±16 dB。"],
+      "comparisons": [
+        {
+          "deviceId": "petla-ive",
+          "shared": "都能當 IR-D 前的 Boost 或 Low Gain 破音。",
+          "differs": "Ive 的整形只有 Tone 與 Saturation Cut 兩個方向；Aquaria 有完整 4-band EQ，而且可以不開破音單獨踩。",
+          "chooseWhen": "只需要一個固定的 Tight Boost 用 Ive；需要在演出中切換兩種 EQ 曲線才輪到 Aquaria。"
+        },
+        {
+          "deviceId": "notadumble-v2",
+          "shared": "都是「一顆踏板兩個功能」的設計。",
+          "differs": "NOTADÜMBLË 的兩側都是增益（Clean Preamp 與 Drive）；Aquaria 是增益加 EQ，第二側不產生失真。",
+          "chooseWhen": "缺的是厚度與 Lead 音色選 NOTADÜMBLË；缺的是可踩的 EQ 才選 Aquaria。"
+        },
+        { "deviceId": "jan-ray", "shared": "都是低增益、以保留原音為訴求的 Overdrive。", "differs": "Jan Ray 只有兩個切除型 EQ、面板四顆旋鈕；Aquaria 有十顆旋鈕、兩個踏板與完整 Boost／Cut EQ。", "chooseWhen": "要面板單純、不想在台上想事情選 Jan Ray；要一顆抵兩顆選 Aquaria。" }
+      ],
+      "evaluation": {
+        "placements": [
+          { "role": "Klon 主破音", "chain": "NOTADÜMBLË Clean → Aquaria → Ive → IR-D Ch.1", "verdict": "可行；但要和 NOTADÜMBLË Drive 二選一，不能兩個都當主破音。" },
+          { "role": "獨立 EQ／Boost", "chain": "NOTADÜMBLË → Ive → Aquaria → IR-D", "verdict": "可行，而且是它最不重疊的用法；不過進 Ch.2 時提升 Level 主要換來的是更多失真。" },
+          { "role": "Low Gain always-on", "chain": "Cali76 → Aquaria → IR-D Ch.1", "verdict": "與 NOTADÜMBLË Clean 重疊，低頻容易堆積過肥。" },
+          { "role": "Metal Tight Boost", "chain": "Aquaria → IR-D Ch.2", "verdict": "不建議；Ive 的中頻取向與 Saturation Cut 更適合這個角色。" }
+        ],
+        "overlaps": ["notadumble-v2", "petla-ive"],
+        "verdict": "hold",
+        "rationale": "四種放法裡只有「獨立 EQ／Boost」是現有三顆給不了的角色。如果哪天需要在演出中切換兩條 EQ 曲線，它就是答案；在那之前它只是把 NOTADÜMBLË 和 Ive 的工作再做一次。",
+        "tradeoffs": ["十顆旋鈕兩個踏板，是這條鏈上面板最複雜的一顆，臨場調整成本最高。", "當主破音就必須放棄 NOTADÜMBLË Drive，等於用一顆換一顆而不是多一顆。", "Buffered 或 True Bypass 是內部指撥，決定之後不能在台上改。"]
+      },
+      "sources": [
+        { "label": "Lichtlærm Audio Aquaria 官方產品頁", "url": "https://lichtlaermaudio.com/shop/aquaria" }
+      ],
+      "caveats": ["這顆不在手上，也沒進過這條鏈。以下都是規格與公開資料的推論，不是實機聽感。", "官方頁面在寫這份資料時仍列的是第一版；V2 的 Dynamics 旋鈕與獨立 Boost 取自評測而非原廠規格表。", "面板旋鈕的分區與排列是本專案依「五個 Overdrive、五個 EQ／Boost」的描述推的，未經實機核對。", "EQ 各段的中心頻率取自評測轉述，原廠沒有公開完整規格表。"]
+    },
+    "empress-drive": {
+      "eyebrow": "Reference · Pre-clipping mid sweep",
+      "summary": "把「哪一段頻率去產生失真」變成一顆可掃的旋鈕，再加 30 dB 可指定前後的 Boost 與自適應 Gate。這是三顆參考機種裡唯一提供現有鏈做不到的事的一顆。",
+      "principles": [
+        { "title": "Mid Freq 在削波之前，這是整顆的重點", "body": "一般破音的 EQ 修的是已經產生的失真；這顆的 Midrange 與 Mid Freq 放在削波電路前面，轉它是在決定哪一段頻率被推進飽和。200 Hz 端得到厚的低中頻破裂，2.5 kHz 端得到切穿與咬字，中間是清晰度。Ive 的 Saturation Cut 只能削掉低中頻，不能選頻。" },
+        { "title": "Mix 是並聯乾訊號，而 Bass／Treble 在 Mix 之後", "body": "拉 Mix 保留原始的 Attack 與透明度；但兩個 Shelving EQ 位在 Mix 後面，所以修它們會同時修到乾訊號。要只改失真的音色，得用 Midrange 而不是 Bass／Treble。" },
+        { "title": "Boost 放前放後是兩種不同的東西", "body": "放削波前是把削波推更兇，同時濾掉低頻堆積，結果是更多飽和與壓縮；放削波後只抬總音量，失真性格不變。一顆踏板兩種用途，但要先在設定裡選定。" }
+      ],
+      "troubleshooting": [
+        { "symptom": "轉 Midrange 只是變吵，找不到甜點", "action": "它在削波前，Gain 越高越敏感。先把 Gain 降下來用 Mid Freq 找位置，再把 Gain 加回去。" },
+        { "symptom": "Mix 拉高之後 EQ 好像沒作用在失真上", "action": "正常：Bass 與 Treble 在 Mix 之後，修的是混合後的訊號。只想改失真本身就用 Midrange。" },
+        { "symptom": "Gate 吃掉延音", "action": "它是自適應的、由輸入訊號觸發，通常是 Gain 太高讓底噪抬起來，不是 Gate 太緊。先降 Gain 或改用 Boost 放後級。" }
+      ],
+      "controlNotes": {
+        "mix": "並聯乾訊號。當透明 Boost 用時往左，當主破音用時往右。",
+        "midrange": "削波前的 EQ，和一般破音的 Tone 不是同一件事。",
+        "mid_freq": "200 Hz–2.5 kHz 可掃；先用它決定失真的性格，再用 Gain 決定量。",
+        "bass": "Mix 之後的 Shelving，會一起修到乾訊號。",
+        "treble": "Mix 之後的 Shelving，會一起修到乾訊號。",
+        "boost": "最高 30 dB；放前放後由 boost_position 決定，兩者聽感差很多。",
+        "gate": "只對這一級之前的噪音有效，處理不了 IR-D 前級自己的 Hiss。",
+        "boost_position": "長按 Boost＋Bypass 切換，不是面板開關；上板前決定。"
+      },
+      "facts": [
+        "Midrange 與 Mid Freq 位於削波電路之前，Mid Freq 可在 200 Hz–2.5 kHz 之間掃。",
+        "三段 Active EQ 皆為 ±15 dB：Bass @200 Hz、Mid 200 Hz–2.5 kHz、Treble @2 kHz。",
+        "Boost 最高 30 dB，可指定放在削波前或削波後。",
+        "66 × 122 × 64 mm、454 g；9V center-negative、250 mA，不支援電池。",
+        "只有 Buffered Bypass，沒有 True Bypass 選項。",
+        "面板有 VU 表顯示削波級被推多兇；Gate 關閉時紅色 LED 亮起。"
+      ],
+      "comparisons": [
+        {
+          "deviceId": "petla-ive",
+          "shared": "都是放在 IR-D 前、負責把訊號整形後推進前級的那一級。",
+          "differs": "Ive 的 Saturation Cut 只能削掉低中頻，方向是固定的；Empress 的 Midrange 可以在 200 Hz–2.5 kHz 之間選一段推或削，而且是在削波前決定。",
+          "chooseWhen": "只需要一個固定的 Tight Boost，Ive 更簡單也更便宜；要針對不同曲目換失真的頻率重心才需要 Empress。"
+        },
+        {
+          "deviceId": "aquaria-v2",
+          "shared": "都是「破音＋EQ＋Boost」三合一，面板都很密。",
+          "differs": "Aquaria 的 4-band EQ 在破音之後，修的是已經產生的失真，而且 EQ 可以獨立踩踏；Empress 的關鍵 EQ 在破音之前，決定的是失真本身，但不能單獨當 EQ 用。",
+          "chooseWhen": "要一顆可踩的獨立 EQ 選 Aquaria；要改變失真的性格而不是修飾它選 Empress。"
+        },
+        { "deviceId": "jan-ray", "shared": "都能當低增益的 Always-on。", "differs": "Jan Ray 只有兩個切除型 EQ、四顆旋鈕，訴求是不改變原音；Empress 有九顆旋鈕，訴求正好相反 —— 讓你決定它怎麼改變原音。", "chooseWhen": "不想在台上想事情選 Jan Ray；願意花時間換到最大調整範圍選 Empress。" }
+      ],
+      "evaluation": {
+        "placements": [
+          { "role": "取代 Ive 的 Pre-EQ／Boost", "chain": "Cali76 → NOTADÜMBLË → Empress Drive → IR-D", "verdict": "最有力的用法。削波前的可掃中頻是現有三顆都做不到的事，而且 Boost 可指定前後等於內建了一顆 Booster。代價是 Ive 的角色被完全取代。" },
+          {
+            "role": "同時解決 Gate 缺口",
+            "chain": "Cali76 → NOTADÜMBLË → Empress Drive → IR-D",
+            "verdict": "不成立。它的 Gate 由自己這一級的輸入訊號觸發，位置在 IR-D 之前，而這條鏈的 Gate 問題正是 IR-D 真空管前級自身的 Hiss —— 那段噪音在它之後才產生。Gate 缺口不會因為買它而關閉。"
+          },
+          { "role": "當主破音，直接進 OX Stomp", "chain": "Cali76 → Empress Drive → OX Stomp", "verdict": "可行，而且會讓整條鏈大幅簡化。但等於放棄 IR-D 的雙通道、Gain Structure 與 Power Amp Simulation，是換一種玩法而不是改良這一條。" },
+          { "role": "Always-on 厚度", "chain": "Cali76 → Empress Drive → NOTADÜMBLË → IR-D", "verdict": "與 NOTADÜMBLË Clean 重疊，而且把九顆旋鈕的彈性浪費在一個固定用途上。" }
+        ],
+        "overlaps": ["petla-ive", "friedman-ir-d"],
+        "verdict": "trial",
+        "rationale": "三顆參考機種裡唯一提供現有鏈做不到的事的一顆：削波前的可掃中頻，決定的是失真的性格而不是失真後的修飾。如果目前對 Ive 唯一的不滿是「只能削低中頻、不能選頻」，那它就是答案。值得借來和 Ive 直接 A／B，但不必在沒聽過之前先買。",
+        "tradeoffs": [
+          "九顆旋鈕的可調範圍是它的賣點，也是臨場調整成本；Ive 五顆旋鈕的簡單是有價值的。",
+          "只有 Buffered Bypass，沒有 True Bypass 選項，串在 Cali76 之後要一起考慮整條鏈的緩衝數量。",
+          "250 mA 是這條鏈上除了 OX Stomp 以外最耗電的一顆，電源供應要重新算。",
+          "內建 Gate 看起來像順便解決了 Gate 缺口，實際上沒有；誤以為解決了反而會讓那個決定被擱置。"
+        ]
+      },
+      "sources": [
+        { "label": "Empress Effects Drive 官方產品頁", "url": "https://empresseffects.com/products/drive" }
+      ],
+      "caveats": [
+        "這顆不在手上，也沒進過這條鏈。以下都是規格與公開資料的推論，不是實機聽感。",
+        "官方產品頁沒有列出完整控制表；九顆旋鈕的名稱與三段 EQ 的頻點取自經銷商規格頁與手冊轉述。",
+        "Boost 前後切換、LED 顏色、開機狀態這些進階設定取自第三方手冊鏡像，未經官方 PDF 核對。",
+        "面板圖的旋鈕排列是依 66 × 122 mm 外殼推的，不是實機配置。",
+        "「它的 Gate 解決不了這條鏈的 Gate 缺口」是從偵測位置推得的結論，不是實測；若實機證明 IR-D 的 Hiss 沒有想像中大，這條要重寫。"
+      ]
+    }
+  }
+}

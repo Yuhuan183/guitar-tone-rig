@@ -1,0 +1,316 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.guitar-rig/schemas/devices.schema.json",
+  "title": "Guitar pedal device catalog",
+  "type": "object",
+  "required": [
+    "catalogVersion",
+    "updatedAt",
+    "categoryLabels",
+    "devices"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "catalogVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date"
+    },
+    "categoryLabels": {
+      "description": "Display label per device category. Every category used by a device must appear here.",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "devices": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/device"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "controlId": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+(?:\\.[a-z0-9_]+)*$"
+    },
+    "direction": {
+      "type": "object",
+      "required": [
+        "left",
+        "right"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "left": {
+          "type": "string"
+        },
+        "right": {
+          "type": "string"
+        }
+      }
+    },
+    "section": {
+      "description": "A display group on the device front panel. Array order is display order.",
+      "type": "object",
+      "required": [
+        "id",
+        "label"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "control": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "section",
+        "type",
+        "valueType",
+        "surface"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/controlId"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "section": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "description": "The shape of the control, and only its shape. Where it lives is `surface`, how many positions it has is `options`, and what it reads is `valueType` — encoding any of those in the name here would be a second copy. Closed so a typo fails validation rather than silently dropping the control from the board diagram.",
+          "enum": [
+            "knob",
+            "rotary-selector",
+            "trimmer",
+            "toggle",
+            "selector",
+            "footswitch",
+            "readout"
+          ]
+        },
+        "valueType": {
+          "enum": [
+            "clock",
+            "number",
+            "enum",
+            "boolean"
+          ]
+        },
+        "unit": {
+          "type": "string"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "step": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "options": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ]
+          }
+        },
+        "direction": {
+          "$ref": "#/$defs/direction"
+        },
+        "description": {
+          "type": "string"
+        },
+        "surface": {
+          "description": "panel = on the front face and drawn on the board diagram; internal = a trimmer inside or on the back, set once and not performed with; software = editor or app only; derived = a target that is read, not set.",
+          "enum": [
+            "panel",
+            "internal",
+            "software",
+            "derived"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "valueType": {
+                "const": "enum"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "options"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "valueType": {
+                "const": "number"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "min",
+              "max"
+            ]
+          }
+        }
+      ]
+    },
+    "device": {
+      "type": "object",
+      "required": [
+        "id",
+        "manufacturer",
+        "model",
+        "category",
+        "subtype",
+        "primaryRole",
+        "placement",
+        "sections",
+        "controls",
+        "appearance"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "manufacturer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "enum": [
+            "dynamics",
+            "gain",
+            "amp-simulator",
+            "speaker-simulator",
+            "gate",
+            "eq",
+            "modulation",
+            "time",
+            "utility"
+          ]
+        },
+        "subtype": {
+          "type": "string",
+          "minLength": 1
+        },
+        "primaryRole": {
+          "type": "string",
+          "minLength": 1
+        },
+        "placement": {
+          "description": "chain = currently routed on the board; reference = kept for comparison and chain evaluation only. The validator holds this to the signal chain in both directions.",
+          "enum": [
+            "chain",
+            "reference"
+          ]
+        },
+        "sections": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/section"
+          }
+        },
+        "controls": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/control"
+          }
+        },
+        "appearance": {
+          "$ref": "#/$defs/appearance"
+        }
+      }
+    },
+    "appearance": {
+      "description": "Schematic enclosure for the board diagram — proportions and colour only, not a likeness of the product. All pedals render at one shared units-per-pixel scale, so widthUnits and heightUnits set the true relative size on the board.",
+      "type": "object",
+      "required": [
+        "widthUnits",
+        "heightUnits",
+        "body",
+        "face"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "widthUnits": {
+          "description": "1 unit ≈ a standard compact enclosure width.",
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 4
+        },
+        "body": {
+          "description": "Enclosure fill.",
+          "type": "string",
+          "pattern": "^#[0-9a-f]{6}$"
+        },
+        "face": {
+          "description": "Legend and knob-cap colour.",
+          "type": "string",
+          "pattern": "^#[0-9a-f]{6}$"
+        },
+        "note": {
+          "type": "string"
+        },
+        "heightUnits": {
+          "description": "1 unit ≈ a standard compact enclosure width, so a typical pedal is taller than it is wide.",
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 4
+        }
+      }
+    }
+  }
+}

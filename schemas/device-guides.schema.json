@@ -1,0 +1,307 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.guitar-rig/schemas/device-guides.schema.json",
+  "title": "Per-device usage guidance",
+  "type": "object",
+  "required": [
+    "guidesVersion",
+    "updatedAt",
+    "guides"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "guidesVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date"
+    },
+    "guides": {
+      "description": "Keyed by deviceId. Every key must exist in devices.json.",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/guide"
+      }
+    }
+  },
+  "$defs": {
+    "deviceId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "label",
+        "url"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "guide": {
+      "type": "object",
+      "required": [
+        "eyebrow",
+        "summary",
+        "principles",
+        "troubleshooting",
+        "sources"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "eyebrow": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "principles": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "body"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "body": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "troubleshooting": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "symptom",
+              "action"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "symptom": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "controlNotes": {
+          "description": "Keyed by controlId. Every key must exist on the matching device.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "workflow": {
+          "type": "object",
+          "required": [
+            "title",
+            "steps"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "steps": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "facts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "warning": {
+          "type": "string"
+        },
+        "sources": {
+          "description": "Official pages and manuals for this device. Links live next to the thing they describe, not in a separate list.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        },
+        "caveats": {
+          "description": "Where confidence in this device’s guidance stops: observation rather than spec, or something that must be re-checked on the real rig.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "chainRole": {
+          "description": "What this stage is for on this particular chain, and what it must not be asked to do. Required for a device whose placement is \"chain\", forbidden for a reference device — it describes a position, and a reference device has none. More than one entry when a device owns more than one job.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "job",
+              "avoid"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "scope": {
+                "description": "Narrows the entry to one half of a device that has two jobs, e.g. NOTADÜMBLË's Clean and Drive sides.",
+                "type": "string",
+                "minLength": 1
+              },
+              "job": {
+                "type": "string",
+                "minLength": 1
+              },
+              "avoid": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "comparisons": {
+          "description": "How this device differs from another one in the catalog. Keyed by deviceId so a model name is never retyped, and so a comparison cannot outlive the device it names.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "deviceId",
+              "shared",
+              "differs",
+              "chooseWhen"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "deviceId": {
+                "$ref": "#/$defs/deviceId"
+              },
+              "shared": {
+                "description": "The job both devices can do, which is why they are comparable at all.",
+                "type": "string",
+                "minLength": 1
+              },
+              "differs": {
+                "description": "The mechanism that actually separates them, not an adjective.",
+                "type": "string",
+                "minLength": 1
+              },
+              "chooseWhen": {
+                "description": "The condition under which this device wins.",
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "evaluation": {
+          "description": "Required for a device whose placement is \"reference\", forbidden for one already on the chain: where it would go, what it would collide with, and whether it earns a slot.",
+          "type": "object",
+          "required": [
+            "placements",
+            "verdict",
+            "rationale"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "placements": {
+              "description": "The positions actually considered, each judged on its own. A pedal with one obvious slot has one entry; a versatile one has several, and the comparison between them is the evaluation.",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "chain",
+                  "verdict"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "role": {
+                    "description": "The job it would be doing in this position.",
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "chain": {
+                    "description": "The resulting signal order, written out.",
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "overlaps": {
+              "description": "Devices already on the chain whose job this one would duplicate.",
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/deviceId"
+              }
+            },
+            "verdict": {
+              "description": "adopt = put it on the board; trial = worth borrowing to hear; hold = no reason to add it right now; reject = ruled out.",
+              "enum": [
+                "adopt",
+                "trial",
+                "hold",
+                "reject"
+              ]
+            },
+            "rationale": {
+              "type": "string",
+              "minLength": 1
+            },
+            "tradeoffs": {
+              "description": "What adopting it would cost, beyond money.",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

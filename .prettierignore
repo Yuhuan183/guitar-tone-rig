@@ -1,0 +1,18 @@
+dist
+node_modules
+package-lock.json
+.claude
+.serena
+
+# Generated
+src/types.generated.ts
+src/responsive.generated.css
+coverage
+
+# Kept in the project's own compact style by scripts/format-data.mjs
+data
+schemas
+
+# One declaration per line keeps the token table scannable; Prettier would
+# expand every component rule to ~8 lines.
+*.css

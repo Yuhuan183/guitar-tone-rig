@@ -1,0 +1,510 @@
+{
+  "$schema": "../schemas/rig.schema.json",
+  "rigId": "yuhuan-main-rig",
+  "rigVersion": "0.4.0",
+  "status": "draft-unverified",
+  "updatedAt": "2026-08-24",
+  "statusNote": "這是討論後的起始設定，尚未以實際吉他、演奏音量及監聽系統驗證。",
+  "deviceCatalog": "devices.json",
+  "signalChain": [
+    { "order": 1, "kind": "endpoint", "id": "guitar", "label": "Guitar" },
+    { "order": 2, "kind": "device", "deviceId": "cali76" },
+    { "order": 3, "kind": "device", "deviceId": "notadumble-v2" },
+    { "order": 4, "kind": "device", "deviceId": "petla-ive" },
+    { "order": 5, "kind": "device", "deviceId": "friedman-ir-d" },
+    { "order": 6, "kind": "device", "deviceId": "uafx-ox-stomp" },
+    { "order": 7, "kind": "endpoint", "id": "monitoring", "label": "Interface / PA / FRFR" }
+  ],
+  "routing": [
+    { "from": "friedman-ir-d.balanced-out", "to": "uafx-ox-stomp.input-1", "signal": "mono-line-level-or-lower", "notes": "IR-D Cab IR Bypass；保留 Power Amp Simulation。" },
+    { "from": "uafx-ox-stomp.output-1-2", "to": "monitoring.input-1-2", "signal": "stereo", "notes": "雙輸出才能保留立體聲 Room、Delay 與 Reverb。" }
+  ],
+  "safetyRules": [
+    { "rule": "OX Stomp 不是 Load Box，不可連接任何音箱 Speaker Output。", "devices": ["uafx-ox-stomp"] },
+    { "rule": "IR-D 的 Cab IR 必須 Bypass，避免與 OX Stomp 重複箱體模擬。", "devices": ["friedman-ir-d", "uafx-ox-stomp"] },
+    { "rule": "NOTADÜMBLË Drive、Ive 高 Gain 與 IR-D Ch.2 不要同時大量削波。", "devices": ["notadumble-v2", "petla-ive", "friedman-ir-d"] }
+  ],
+  "calibration": {
+    "title": "第一次校正流程",
+    "steps": [
+      "關閉 Cali76、NOTADÜMBLË Drive、Ive 與 OX Master FX，只建立 IR-D Ch.1＋OX Clean Rig。",
+      "打開 NOTADÜMBLË Clean，用 Output 校正 Level，再用 Input 調厚薄。",
+      "調 Cali76 IN：一般彈奏亮兩顆、重撥短暫三顆；用 OUT／DRY 對齊音量。",
+      "打開 Ive，確認 Ch.1 Crunch 不會過薄；必要時只把 Saturation Cut 移到 8:30–9:00。",
+      "建立 IR-D Ch.2 單獨的 Hard Rock，先肥而不糊；再開 Ive 收緊成 Metal。",
+      "最後調 NOTADÜMBLË Drive 與 OX Lead Rig，校正 Solo Level。",
+      "在實際演奏音量重新檢查 Bass、Room 與 OX Output。"
+    ]
+  },
+  "diagnostics": [
+    { "symptom": "Clean 太平、缺少 Pick Attack", "check": "檢查 Cali76 Attack 是否太快、Gain Reduction 是否經常超過 5 dB。", "devices": ["cali76"] },
+    { "symptom": "Metal 糊又吵", "check": "關閉 Cali76、降低 Ive Gain，並確認 IR-D Gain 沒有超過實際需求。", "devices": ["cali76", "petla-ive", "friedman-ir-d"] },
+    { "symptom": "Metal 太薄", "check": "Ive Saturation Cut 由全左移到 8:30–9:00，保留 IR-D Middle。", "devices": ["petla-ive", "friedman-ir-d"] },
+    { "symptom": "OX 音量比 Bypass 小", "check": "Output 從約 3 點往上校正，同時檢查 Mic 1／2 Level。", "devices": ["uafx-ox-stomp"] }
+  ],
+  "openSlots": [
+    {
+      "id": "noise-gate",
+      "label": "Gate",
+      "problem": "多顆 Gain 不會讓 Gate 失效，真正的問題是偵測位置。只放在 IR-D 前，消不掉 IR-D 真空管前級自身的 Hiss；只放在所有失真之後，又會用嚴重失真的訊號判斷開關，吞掉尾音。",
+      "topology": ["Guitar → Gate Input", "Gate Send → Cali76 → NOTADÜMBLË → Ive → IR-D Input", "IR-D FX Send → Gate Return", "Gate Output → IR-D FX Return → OX Stomp"],
+      "rules": [
+        "Threshold 只比靜止噪音高一點，不為絕對安靜犧牲自然尾音。",
+        "Clean／Low Gain 使用 Reduction；Metal 才用快速 Gate。",
+        "Gate 只能讓休止時安靜，不能移除音符中的 Hum／Hiss。",
+        "先查隔離電源、接地、Patch Cable 與單線圈方向，再提高 Threshold。",
+        "IR-D 單獨使用非接地電源與耳機可能增加 Hum；接到有接地的介面或 Monitor 可改善。",
+        "四線法可能形成地迴路；Pylon 的 Transformer／Ground Lift 對這類情境有實際用途。"
+      ],
+      "candidates": [
+        {
+          "name": "KMA Machines Pylon",
+          "verdict": "最符合需求",
+          "url": "https://kmamachines.com/machines/pylon/",
+          "notes": "VCA Gate＋最高 30 dB Transformer Boost，Low Cut 約 65–730 Hz、6 dB/oct；四線法可包住整段 Gain Chain，Ground Lift 也能處理部分地迴路。"
+        },
+        { "name": "BOSS NS-1X", "verdict": "自然尾音", "url": "https://www.boss.info/global/products/ns-1x/", "notes": "Reduction 適合 Clean／Low Gain，Gate 適合快速 Metal Rhythm；沒有 Boost／EQ，但控制自然。" },
+        { "name": "Horizon Precision Drive", "verdict": "Ive 替代", "url": "https://horizondevices.com/products/precision-drive", "notes": "Metal Tightening、Attack、Boost 加簡易 Gate；位於 IR-D 前，無法完整處理前級 Hiss。" }
+      ]
+    }
+  ],
+  "baseline": {
+    "id": "shared-baseline",
+    "description": "所有音色先繼承此設定，再套用各 Preset 的 overrides。",
+    "settings": {
+      "notadumble-v2": [
+        { "controlId": "clean_bypass", "value": "on", "confidence": "provisional" },
+        { "controlId": "internal_order", "value": "drive-into-clean", "confidence": "provisional" },
+        {
+          "controlId": "clean_input",
+          "range": { "min": "12:00", "max": "13:00" },
+          "confidence": "needs-calibration"
+        },
+        { "controlId": "clean_output", "target": "Bypass Unity 到 +1 dB", "confidence": "needs-calibration" },
+        { "controlId": "drive_volume", "target": "Solo 時比 Clean 大 3–4 dB", "confidence": "needs-calibration", "notes": "相對音量，不是絕對位置；跟著 Clean Output 校完再定。" }
+      ],
+      "petla-ive": [
+        {
+          "controlId": "gain",
+          "range": { "min": "08:00", "max": "09:00" },
+          "confidence": "needs-calibration"
+        },
+        {
+          "controlId": "volume",
+          "range": { "min": "13:00", "max": "14:00" },
+          "confidence": "needs-calibration"
+        },
+        {
+          "controlId": "tone",
+          "range": { "min": "11:30", "max": "12:30" },
+          "confidence": "needs-calibration"
+        },
+        {
+          "controlId": "saturation_cut",
+          "range": { "min": "07:00", "max": "08:30" },
+          "confidence": "needs-calibration",
+          "notes": "左側削中低頻；太薄時先移到 08:30–09:00。"
+        }
+      ],
+      "friedman-ir-d": [
+        { "controlId": "cab_ir", "value": "bypass", "confidence": "provisional" },
+        { "controlId": "power_amp_sim", "value": "on", "confidence": "provisional" },
+        { "controlId": "ch1.gain_structure", "value": "low-headroom", "confidence": "provisional" },
+        {
+          "controlId": "ch1.gain",
+          "range": { "min": "11:00", "max": "12:30" },
+          "confidence": "needs-calibration"
+        },
+        {
+          "controlId": "ch1.bass",
+          "range": { "min": "11:30", "max": "12:30" },
+          "confidence": "needs-calibration"
+        },
+        {
+          "controlId": "ch1.middle",
+          "range": { "min": "12:30", "max": "13:30" },
+          "confidence": "needs-calibration"
+        },
+        {
+          "controlId": "ch1.treble",
+          "range": { "min": "11:00", "max": "12:00" },
+          "confidence": "needs-calibration"
+        },
+        { "controlId": "ch1.bright_tight", "value": "full-fat", "confidence": "provisional" },
+        {
+          "controlId": "ch1.thump",
+          "choices": { "preferred": "low", "alternatives": ["medium"] },
+          "confidence": "needs-calibration"
+        },
+        { "controlId": "ch1.presence", "value": "medium", "confidence": "needs-calibration" },
+        { "controlId": "ch2.gain_structure", "value": "high-gain", "confidence": "provisional" },
+        {
+          "controlId": "ch2.gain",
+          "range": { "min": "10:30", "max": "12:00" },
+          "confidence": "needs-calibration"
+        },
+        {
+          "controlId": "ch2.bass",
+          "range": { "min": "09:30", "max": "10:30" },
+          "confidence": "needs-calibration"
+        },
+        {
+          "controlId": "ch2.middle",
+          "range": { "min": "12:30", "max": "13:30" },
+          "confidence": "needs-calibration"
+        },
+        {
+          "controlId": "ch2.treble",
+          "range": { "min": "11:30", "max": "12:30" },
+          "confidence": "needs-calibration"
+        },
+        { "controlId": "ch2.bright_tight", "value": "bright-tight", "confidence": "provisional" },
+        { "controlId": "ch2.thump", "value": "low", "confidence": "needs-calibration" },
+        { "controlId": "ch2.presence", "value": "medium", "confidence": "needs-calibration" }
+      ],
+      "uafx-ox-stomp": [
+        { "controlId": "bypass", "value": "on", "confidence": "provisional" },
+        {
+          "controlId": "output",
+          "range": { "min": "15:00", "max": "17:00" },
+          "confidence": "needs-calibration",
+          "notes": "由 15:00 開始校正 Unity。"
+        },
+        { "controlId": "compressor", "value": "off", "confidence": "provisional" },
+        { "controlId": "mic1_level", "target": "與 Mic 2 混到聽起來像一支麥克風", "confidence": "needs-calibration", "notes": "兩支 Mic 的比例是聽感決定的，單獨一支的位置沒有意義。" },
+        { "controlId": "mic2_level", "target": "與 Mic 1 混到聽起來像一支麥克風", "confidence": "needs-calibration", "notes": "相位與比例一起聽；拉高任一支都會改變中頻。" }
+      ],
+      "cali76": [
+        { "controlId": "input", "target": "一般彈奏亮兩顆 LED、重撥短暫亮三顆", "confidence": "needs-calibration", "notes": "壓縮量由這裡決定，隨拾音器輸出改變，沒有通用的鐘點位置。" }
+      ]
+    }
+  },
+  "presets": [
+    {
+      "id": "mayer-asato-clean",
+      "name": "Mayer / Asato Clean",
+      "rigSlot": 1,
+      "inherits": "shared-baseline",
+      "status": "untested",
+      "target": "圓潤、清楚、有觸弦動態及延音的 Clean／Edge-of-breakup",
+      "genres": ["Neo Soul", "Blues", "Pop", "Fusion"],
+      "pickupPreference": ["neck-single-coil", "neck-humbucker-split"],
+      "tier": "primary",
+      "settings": {
+        "cali76": [
+          { "controlId": "bypass", "value": "on", "confidence": "provisional" },
+          { "controlId": "ratio", "value": 4, "confidence": "provisional" },
+          {
+            "controlId": "attack",
+            "range": { "min": "09:30", "max": "11:00" },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "release",
+            "range": { "min": "12:00", "max": "13:30" },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "dry",
+            "range": { "min": "13:00", "max": "14:00" },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "gr_peak",
+            "range": { "min": 3, "max": 5 },
+            "confidence": "needs-calibration",
+            "notes": "一般彈奏約 1–3 dB，最重撥弦短暫碰到 5 dB。"
+          },
+          { "controlId": "output", "target": "Bypass Unity", "confidence": "needs-calibration" }
+        ],
+        "notadumble-v2": [
+          { "controlId": "drive_bypass", "value": "off", "confidence": "provisional" }
+        ],
+        "petla-ive": [
+          { "controlId": "bypass", "value": "off", "confidence": "provisional" }
+        ],
+        "friedman-ir-d": [
+          { "controlId": "active_channel", "value": "ch1", "confidence": "provisional" }
+        ],
+        "uafx-ox-stomp": [
+          { "controlId": "rig_slot", "value": 1, "confidence": "provisional" },
+          {
+            "controlId": "cab",
+            "choices": { "preferred": "1x12-jbg125", "alternatives": ["2x12-two-verb"] },
+            "confidence": "needs-calibration"
+          },
+          { "controlId": "mic1_type", "value": "67", "confidence": "needs-calibration" },
+          { "controlId": "mic2_type", "value": "121", "confidence": "needs-calibration" },
+          {
+            "controlId": "room",
+            "range": { "min": "10:30", "max": "12:00" },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "speaker_drive",
+            "range": { "min": "09:00", "max": "10:00" },
+            "confidence": "needs-calibration"
+          },
+          { "controlId": "plate", "value": "low", "confidence": "needs-calibration" },
+          { "controlId": "delay", "value": "off", "confidence": "provisional" },
+          {
+            "controlId": "low_cut",
+            "range": { "min": 60, "max": 75 },
+            "confidence": "needs-calibration"
+          }
+        ]
+      }
+    },
+    {
+      "id": "japanese-low-gain",
+      "name": "Japanese Low Gain",
+      "rigSlot": 2,
+      "inherits": "shared-baseline",
+      "status": "untested",
+      "target": "低頻收束、中頻向前、清脆快速且保留和弦分離度",
+      "genres": ["J-Pop", "City Pop", "Fusion", "J-Rock"],
+      "pickupPreference": ["bridge-single-coil", "middle-single-coil", "bridge-humbucker"],
+      "tier": "primary",
+      "settings": {
+        "cali76": [
+          { "controlId": "bypass", "value": "on", "confidence": "provisional" },
+          { "controlId": "ratio", "value": 4, "confidence": "provisional" },
+          {
+            "controlId": "gr_peak",
+            "range": { "min": 2, "max": 4 },
+            "confidence": "needs-calibration"
+          }
+        ],
+        "notadumble-v2": [
+          { "controlId": "drive_bypass", "value": "off", "confidence": "provisional" }
+        ],
+        "petla-ive": [
+          { "controlId": "bypass", "value": "on", "confidence": "provisional" }
+        ],
+        "friedman-ir-d": [
+          { "controlId": "active_channel", "value": "ch1", "confidence": "provisional" }
+        ],
+        "uafx-ox-stomp": [
+          { "controlId": "rig_slot", "value": 2, "confidence": "provisional" },
+          { "controlId": "cab", "value": "2x12-d65", "confidence": "needs-calibration" },
+          { "controlId": "mic1_type", "value": "57", "confidence": "needs-calibration" },
+          { "controlId": "mic2_type", "value": "121", "confidence": "needs-calibration" },
+          {
+            "controlId": "room",
+            "range": { "min": "09:30", "max": "10:30" },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "speaker_drive",
+            "range": { "min": "10:00", "max": "11:00" },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "plate",
+            "choices": { "preferred": "off", "alternatives": ["low"] },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "delay",
+            "choices": { "preferred": "off", "alternatives": ["short-low"] },
+            "confidence": "needs-calibration"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dumble-lead",
+      "name": "Dumble-style Lead",
+      "rigSlot": 3,
+      "inherits": "shared-baseline",
+      "status": "untested",
+      "target": "平滑、歌唱性、延音充足但仍保留 Pick 輪廓的 Lead",
+      "genres": ["Blues Rock", "Fusion Lead", "Melodic Solo"],
+      "pickupPreference": ["neck-single-coil", "neck-humbucker"],
+      "tier": "secondary",
+      "settings": {
+        "cali76": [
+          {
+            "controlId": "bypass",
+            "choices": { "preferred": "off", "alternatives": ["on"] },
+            "confidence": "needs-calibration",
+            "notes": "太滑或太扁就關閉。"
+          }
+        ],
+        "notadumble-v2": [
+          { "controlId": "drive_bypass", "value": "on", "confidence": "provisional" },
+          {
+            "controlId": "drive",
+            "range": { "min": "12:30", "max": "13:30" },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "drive_level_lift",
+            "range": { "min": 1, "max": 2 },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "eq",
+            "range": { "min": "10:30", "max": "11:30" },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "presence",
+            "range": { "min": "10:30", "max": "11:30" },
+            "confidence": "needs-calibration"
+          }
+        ],
+        "petla-ive": [
+          { "controlId": "bypass", "value": "off", "confidence": "provisional" }
+        ],
+        "friedman-ir-d": [
+          { "controlId": "active_channel", "value": "ch1", "confidence": "provisional" }
+        ],
+        "uafx-ox-stomp": [
+          { "controlId": "rig_slot", "value": 3, "confidence": "provisional" },
+          {
+            "controlId": "cab",
+            "choices": { "preferred": "2x12-d65", "alternatives": ["2x12-alnico-50"] },
+            "confidence": "needs-calibration"
+          },
+          { "controlId": "mic1_type", "value": "421", "confidence": "needs-calibration" },
+          {
+            "controlId": "mic2_type",
+            "choices": { "preferred": "121", "alternatives": ["67"] },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "room",
+            "range": { "min": "10:00", "max": "11:00" },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "speaker_drive",
+            "range": { "min": "10:30", "max": "12:00" },
+            "confidence": "needs-calibration"
+          },
+          { "controlId": "plate", "value": "low", "confidence": "needs-calibration" },
+          { "controlId": "delay", "value": "short-low", "confidence": "needs-calibration" },
+          {
+            "controlId": "high_cut",
+            "range": { "min": 8000, "max": 10000 },
+            "confidence": "needs-calibration"
+          }
+        ]
+      }
+    },
+    {
+      "id": "british-hard-rock",
+      "name": "British Hard Rock",
+      "rigSlot": 4,
+      "inherits": "shared-baseline",
+      "status": "untested",
+      "target": "開放、有重量、帶英式中頻與足夠咬字的標準 Rock 失真",
+      "genres": ["Classic Rock", "Hard Rock", "80s Rock"],
+      "pickupPreference": ["bridge-humbucker", "bridge-p90"],
+      "tier": "secondary",
+      "settings": {
+        "cali76": [
+          {
+            "controlId": "bypass",
+            "choices": { "preferred": "off", "alternatives": ["on"] },
+            "confidence": "needs-calibration"
+          }
+        ],
+        "notadumble-v2": [
+          { "controlId": "drive_bypass", "value": "off", "confidence": "provisional" }
+        ],
+        "petla-ive": [
+          { "controlId": "bypass", "value": "off", "confidence": "provisional" }
+        ],
+        "friedman-ir-d": [
+          { "controlId": "active_channel", "value": "ch2", "confidence": "provisional" }
+        ],
+        "uafx-ox-stomp": [
+          { "controlId": "rig_slot", "value": 4, "confidence": "provisional" },
+          {
+            "controlId": "cab",
+            "choices": { "preferred": "4x12-gb25-punch", "alternatives": ["4x12-gb30"] },
+            "confidence": "needs-calibration"
+          },
+          { "controlId": "mic1_type", "value": "57", "confidence": "needs-calibration" },
+          { "controlId": "mic2_type", "value": "121", "confidence": "needs-calibration" },
+          {
+            "controlId": "room",
+            "range": { "min": "09:00", "max": "10:00" },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "speaker_drive",
+            "range": { "min": "10:00", "max": "11:30" },
+            "confidence": "needs-calibration"
+          },
+          { "controlId": "plate", "value": "off", "confidence": "provisional" },
+          { "controlId": "delay", "value": "off", "confidence": "provisional" },
+          {
+            "controlId": "low_cut",
+            "range": { "min": 70, "max": 85 },
+            "confidence": "needs-calibration"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tight-japanese-metal",
+      "name": "Tight Japanese Metal",
+      "rigSlot": 5,
+      "inherits": "shared-baseline",
+      "status": "untested",
+      "target": "緊實快速、低頻不糊、中頻保留旋律與雙吉他存在感",
+      "genres": ["J-Metal", "Visual Kei", "Melodic Metal"],
+      "pickupPreference": ["bridge-humbucker"],
+      "tier": "primary",
+      "settings": {
+        "cali76": [
+          { "controlId": "bypass", "value": "off", "confidence": "provisional" }
+        ],
+        "notadumble-v2": [
+          { "controlId": "drive_bypass", "value": "off", "confidence": "provisional" }
+        ],
+        "petla-ive": [
+          { "controlId": "bypass", "value": "on", "confidence": "provisional" }
+        ],
+        "friedman-ir-d": [
+          { "controlId": "active_channel", "value": "ch2", "confidence": "provisional" }
+        ],
+        "uafx-ox-stomp": [
+          { "controlId": "rig_slot", "value": 5, "confidence": "provisional" },
+          { "controlId": "cab", "value": "4x12-uk-vee-30", "confidence": "needs-calibration" },
+          { "controlId": "mic1_type", "value": "57", "confidence": "needs-calibration" },
+          {
+            "controlId": "mic2_type",
+            "choices": { "preferred": "421", "alternatives": ["121"] },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "room",
+            "range": { "min": "08:30", "max": "09:30" },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "speaker_drive",
+            "range": { "min": "08:30", "max": "09:30" },
+            "confidence": "needs-calibration"
+          },
+          { "controlId": "plate", "value": "off", "confidence": "provisional" },
+          { "controlId": "delay", "value": "off", "confidence": "provisional" },
+          {
+            "controlId": "low_cut",
+            "range": { "min": 75, "max": 90 },
+            "confidence": "needs-calibration"
+          },
+          {
+            "controlId": "high_cut",
+            "range": { "min": 8000, "max": 10000 },
+            "confidence": "needs-calibration"
+          }
+        ]
+      }
+    }
+  ]
+}

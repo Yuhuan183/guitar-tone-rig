@@ -1,0 +1,26 @@
+/* Generated from src/lib/responsive.ts by scripts/generate-responsive.mjs.
+   Do not edit; run `npm run generate:responsive`.
+
+   --scale-pedal-board: px per enclosure unit on the board; the whole board scales together.
+   --scale-pedal-card: Library card thumbnail.
+   --scale-pedal-figure: The editable drawing on a device page.
+   --scale-shell-gutter: Page margin either side of the workspace.
+   --scale-card-padding: Padding inside a panel.
+   --scale-title-page: h1.
+   --scale-title-section: h2. */
+
+:root {
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-xxl: 1440px;
+
+  --scale-pedal-board: clamp(44px, calc(36.6667px + 2.037vw), 66px);
+  --scale-pedal-card: clamp(38px, calc(32.6667px + 1.4815vw), 54px);
+  --scale-pedal-figure: clamp(62px, calc(45.3333px + 4.6296vw), 112px);
+  --scale-shell-gutter: clamp(0.625rem, calc(0.25rem + 1.6667vw), 1.75rem);
+  --scale-card-padding: clamp(1.0625rem, calc(0.875rem + 0.8333vw), 1.625rem);
+  --scale-title-page: clamp(2rem, calc(1.5833rem + 1.8519vw), 3.25rem);
+  --scale-title-section: clamp(1.1875rem, calc(1.0417rem + 0.6481vw), 1.625rem);
+}

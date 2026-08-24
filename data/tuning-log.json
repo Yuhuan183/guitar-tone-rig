@@ -1,0 +1,1 @@
+{ "$schema": "../schemas/tuning-log.schema.json", "rigId": "yuhuan-main-rig", "instructions": "每次只改一到兩個控制項，記錄吉他、拾音器、監聽與音量；確認後再把 rig.json 對應 setting 的 status 改為 verified。", "sessions": [] }
