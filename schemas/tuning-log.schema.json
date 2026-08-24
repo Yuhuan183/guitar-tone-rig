@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://local.guitar-rig/schemas/tuning-log.schema.json",
+  "$id": "https://local.guitar-tone-rig/schemas/tuning-log.schema.json",
   "title": "Guitar rig tuning log",
   "type": "object",
   "required": ["rigId", "sessions"],

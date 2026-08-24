@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://local.guitar-rig/schemas/devices.schema.json",
+  "$id": "https://local.guitar-tone-rig/schemas/devices.schema.json",
   "title": "Guitar pedal device catalog",
   "type": "object",
   "required": [
