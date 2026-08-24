@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://local.guitar-rig/schemas/rig.schema.json",
+  "$id": "https://local.guitar-tone-rig/schemas/rig.schema.json",
   "title": "Guitar rig and tone presets",
   "type": "object",
   "required": [

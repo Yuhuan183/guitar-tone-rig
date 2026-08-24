@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
 import type { ScalarValue, UserOverrides } from '../types'
 import { acceptsValue, deviceById, presetById, rig } from '../lib/rig'
 
@@ -17,6 +17,31 @@ interface RigState {
 }
 
 const defaultPresetId = rig.presets[0]?.id ?? ''
+
+const PERSIST_KEY = 'guitar-tone-rig'
+/** What the key was called before the project was renamed. */
+const FORMER_PERSIST_KEY = 'guitar-rig-control-room'
+
+/**
+ * Reads the former key once and moves it across, so a rename in the repository
+ * does not silently start someone over on a rig they have already tuned. The
+ * old key is removed on the way past: on GitHub Pages the origin is shared with
+ * every other project page on this account, and leaving a stray key there helps
+ * nobody.
+ */
+const storageAdoptingFormerKey = {
+  getItem: (name: string) => {
+    const current = localStorage.getItem(name)
+    if (current !== null) return current
+    const former = localStorage.getItem(FORMER_PERSIST_KEY)
+    if (former === null) return null
+    localStorage.setItem(name, former)
+    localStorage.removeItem(FORMER_PERSIST_KEY)
+    return former
+  },
+  setItem: (name: string, value: string) => localStorage.setItem(name, value),
+  removeItem: (name: string) => localStorage.removeItem(name),
+}
 
 /**
  * Drops overrides pointing at presets, devices or controls that no longer
@@ -93,7 +118,8 @@ export const useRigStore = create<RigState>()(
       toggleCompareMode: () => set((state) => ({ compareMode: !state.compareMode })),
     }),
     {
-      name: 'guitar-rig-control-room',
+      name: PERSIST_KEY,
+      storage: createJSONStorage(() => storageAdoptingFormerKey),
       // v1 persisted overrides that were never checked against the catalog;
       // onRehydrateStorage prunes them, so the shape itself needs no rewrite.
       version: 2,
